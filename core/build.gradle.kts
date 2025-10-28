@@ -11,6 +11,8 @@ kotlin {
             api(libs.opentelemetry.semconv)
             api(libs.opentelemetry.exporter.otlp)
             api(libs.opentelemetry.ktor)
+            api(project(":domain"))
+            implementation(libs.mongodb.driver.kotlin.coroutine)
         }
     }
 }
