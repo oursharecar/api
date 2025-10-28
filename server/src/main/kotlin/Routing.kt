@@ -3,14 +3,11 @@ package com.github.oursharecar
 import com.ucasoft.ktor.simpleCache.SimpleCache
 import com.ucasoft.ktor.simpleCache.cacheOutput
 import com.ucasoft.ktor.simpleMemoryCache.memoryCache
-import io.ktor.server.application.Application
-import io.ktor.server.application.install
-import io.ktor.server.plugins.conditionalheaders.ConditionalHeaders
-import io.ktor.server.plugins.defaultheaders.DefaultHeaders
-import io.ktor.server.response.respond
-import io.ktor.server.response.respondText
-import io.ktor.server.routing.get
-import io.ktor.server.routing.routing
+import io.ktor.server.application.*
+import io.ktor.server.plugins.conditionalheaders.*
+import io.ktor.server.plugins.defaultheaders.*
+import io.ktor.server.response.*
+import io.ktor.server.routing.*
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
