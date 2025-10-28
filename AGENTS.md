@@ -1,35 +1,34 @@
 # Repository Guidelines
 
 ## Project Structure & Module Organization
-- `server/src/main/kotlin` hosts the Ktor entrypoints (`Application.kt`, `Routing.kt`, etc.) with configuration in `server/src/main/resources/application.yaml`.
-- `server/src/test/kotlin` contains HTTP and serialization tests driven by `kotlin.test`.
-- `core/src/commonMain/kotlin` defines shared telemetry contracts consumed by both the server and the client.
-- `client/src/commonMain/kotlin` provides HTTP helpers for calling the server; keep generated build outputs under each module’s `build/` directory out of commits.
+- `server/src/main/kotlin` hosts Ktor entrypoints (`Application.kt`, `Routing.kt`) and service wiring.
+- `server/src/test/kotlin` mirrors the server package layout for HTTP and serialization tests.
+- Shared telemetry contracts live in `core/src/commonMain/kotlin` for reuse across modules.
+- HTTP client helpers for the server API are in `client/src/commonMain/kotlin`.
+- Generated outputs are kept under each module’s `build/` directory; never commit these artifacts.
 
 ## Build, Test, and Development Commands
-- `./gradlew build` compiles all modules and executes their test suites.
-- `./gradlew :server:run` starts the CIO server locally (listens on http://localhost:8080 by default).
-- `./gradlew :server:buildFatJar` produces a runnable shaded JAR in `server/build/libs/`.
+- `./gradlew build` compiles all modules and executes their test suites; run before every PR.
+- `./gradlew :server:run` launches the CIO server locally on `http://localhost:8080`.
+- `./gradlew :server:buildFatJar` produces a shaded JAR in `server/build/libs/`.
 - `./gradlew :server:publishImageToLocalRegistry` publishes the Docker image built from the fat JAR.
-Ensure a JDK 17+ is installed—the wrapper targets Kotlin 2.2.20 and Ktor 3.3.0.
 
 ## Coding Style & Naming Conventions
-- Use Kotlin’s standard 4-space indentation and enable trailing commas in multiline argument lists.
-- Keep packages lowercase dot-separated; classes and objects UpperCamelCase; functions and properties lowerCamelCase.
-- Keep routing logic in top-level functions (`Routing.kt`) and model contracts in `core` to simplify reuse.
-- Run `./gradlew build` before committing to catch compiler and serialization configuration issues; introduce additional linters only once they are wired into `build.gradle.kts`.
+- Kotlin 4-space indentation everywhere; enable trailing commas in multiline argument lists.
+- Packages remain lowercase dot-separated; classes/objects use UpperCamelCase; functions and properties use lowerCamelCase.
+- Keep routing logic in top-level functions under `server/src/main/kotlin`, and place reusable contracts in `core`.
 
 ## Testing Guidelines
-- Mirror source packages in `server/src/test/kotlin`; reuse `ApplicationTest.kt` as the template for new route scenarios.
-- Prefer `testApplication {}` for endpoint coverage and `kotlin.test` assertions for lightweight checks.
-- Add integration tests when touching routing, authentication, or serialization; keep domain-only tests inside `core`.
-- Execute `./gradlew :server:test` prior to every PR and note remaining manual verification in the PR description.
+- Use `kotlin.test` with `testApplication {}` for endpoint coverage; follow the layout in `server/src/test/kotlin/ApplicationTest.kt`.
+- Add integration tests when modifying routing, authentication, or serialization; keep domain-only checks in `core`.
+- Run `./gradlew :server:test` for server-only verification; prefer `./gradlew build` before pushing.
 
 ## Commit & Pull Request Guidelines
-- Follow the existing history: concise imperative subjects (e.g., `Add health check`) under 72 characters, optional body for context.
-- Reference issue IDs in the body when available and describe configuration or schema changes explicitly.
-- PRs should summarize module impact, list executed commands, and attach curl examples or screenshots for user-facing changes.
+- Write imperative commit subjects under 72 characters (e.g., `Add health check`); include bodies for context or issue links.
+- PRs should summarize module impact, list executed commands, and attach curl examples or screenshots for user-visible changes.
+- Call out configuration or schema updates explicitly and verify that tests pass locally before requesting review.
 
-## Configuration Tips
-- Adjust environment-specific values in `server/src/main/resources/application.yaml`; never commit secrets—pass them via environment variables.
-- Log levels live in `server/src/main/resources/logback.xml`; tune logging there rather than in code.
+## Configuration & Security Tips
+- Adjust environment-specific settings in `server/src/main/resources/application.yaml`; never commit secrets—pass them via environment variables.
+- Tune log levels in `server/src/main/resources/logback.xml` instead of in code.
+- Confirm JDK 17+ is installed; Kotlin 2.2.20 and Ktor 3.3.0 are the baseline versions targeted by the Gradle wrapper.
