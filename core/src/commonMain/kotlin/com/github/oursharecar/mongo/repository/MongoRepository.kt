@@ -1,5 +1,8 @@
-package com.github.oursharecar
+package com.github.oursharecar.mongo.repository
 
+import com.github.oursharecar.domain.common.Page
+import com.github.oursharecar.domain.common.PageRequest
+import com.github.oursharecar.domain.common.PagedRepository
 import com.mongodb.client.model.Filters
 import com.mongodb.client.model.Sorts
 import com.mongodb.client.model.Updates
@@ -11,10 +14,11 @@ import org.bson.conversions.Bson
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
-abstract class MongoRepository<ID, E : Any> (
-    val collection: MongoCollection<E>,
+@OptIn(ExperimentalTime::class)
+abstract class MongoRepository<ID, E : Any>(
+    protected val collection: MongoCollection<E>,
     protected val idSelector: (E) -> ID
-): PagedRepository<ID, E> {
+) : PagedRepository<ID, E> {
     protected open fun baseFilter(): Bson = Filters.eq("audit.deletedAt", null)
 
     override suspend fun findById(id: ID): E? {
@@ -35,7 +39,6 @@ abstract class MongoRepository<ID, E : Any> (
         return result.matchedCount > 0 || result.upsertedId != null
     }
 
-    @OptIn(ExperimentalTime::class)
     override suspend fun deleteById(id: ID): Boolean {
         val now = Clock.System.now()
         val result = collection.updateOne(
@@ -47,14 +50,14 @@ abstract class MongoRepository<ID, E : Any> (
 
     override fun findAll(): Flow<E> = collection.find(baseFilter())
 
-    override suspend fun page(req: PageRequest): Page<E> {
+    override suspend fun page(request: PageRequest): Page<E> {
         val filter = baseFilter()
         val total = collection.countDocuments(filter)
         val items = collection.find(filter)
             .sort(Sorts.descending("audit.createdAt"))
-            .skip((req.page - 1) * req.size)
-            .limit(req.size)
+            .skip((request.page - 1) * request.size)
+            .limit(request.size)
             .toList()
-        return Page(items, total, req.page, req.size)
+        return Page(items, total, request.page, request.size)
     }
 }

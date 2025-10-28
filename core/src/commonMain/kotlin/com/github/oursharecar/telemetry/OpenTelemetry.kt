@@ -1,12 +1,12 @@
-package com.github.oursharecar
+package com.github.oursharecar.telemetry
 
 import io.opentelemetry.api.OpenTelemetry
 import io.opentelemetry.sdk.autoconfigure.AutoConfiguredOpenTelemetrySdk
 import io.opentelemetry.semconv.ServiceAttributes
 
-fun getOpenTelemetry(serviceName: String): OpenTelemetry {
-    // Disable metrics exporter because the `jaegertracing/all-in-one`image, which we use in the example,
-    // does not support OpenTelemetry metrics, so we prevent unnecessary configuration or warnings.
+fun buildOpenTelemetry(serviceName: String): OpenTelemetry {
+    // Disable metrics exporter because the `jaegertracing/all-in-one` image we use locally
+    // does not support OpenTelemetry metrics. This avoids unnecessary configuration warnings.
     System.setProperty("otel.metrics.exporter", "none")
 
     return AutoConfiguredOpenTelemetrySdk.builder().addResourceCustomizer { oldResource, _ ->
@@ -16,4 +16,3 @@ fun getOpenTelemetry(serviceName: String): OpenTelemetry {
             .build()
     }.build().openTelemetrySdk
 }
-

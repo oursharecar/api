@@ -1,11 +1,12 @@
 package com.github.oursharecar
 
+import com.github.oursharecar.telemetry.buildOpenTelemetry
 import io.ktor.client.*
 import io.ktor.http.*
 import io.opentelemetry.instrumentation.ktor.v3_0.KtorClientTelemetry
 
 fun HttpClientConfig<*>.configureForProject() {
-    val openTelemetry = getOpenTelemetry(serviceName = "opentelemetry-ktor-sample-client")
+    val openTelemetry = buildOpenTelemetry(serviceName = "opentelemetry-ktor-sample-client")
     
     install(KtorClientTelemetry) {
         setOpenTelemetry(openTelemetry)

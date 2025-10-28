@@ -1,4 +1,4 @@
-package com.github.oursharecar
+package com.github.oursharecar.mongo.config
 
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings

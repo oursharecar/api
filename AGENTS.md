@@ -32,3 +32,8 @@
 - Adjust environment-specific settings in `server/src/main/resources/application.yaml`; never commit secrets—pass them via environment variables.
 - Tune log levels in `server/src/main/resources/logback.xml` instead of in code.
 - Confirm JDK 17+ is installed; Kotlin 2.2.20 and Ktor 3.3.0 are the baseline versions targeted by the Gradle wrapper.
+
+## Future Plans
+- Introduce contract tests for the Mongo repositories to exercise pagination and soft-delete flows.
+- Add structured logging contexts around routing to surface tenant identifiers and request IDs.
+- Wire JWT configuration to a secrets manager stub so local runs mimic production setup.

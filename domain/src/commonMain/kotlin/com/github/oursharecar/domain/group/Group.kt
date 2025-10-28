@@ -1,4 +1,6 @@
-package com.github.oursharecar
+package com.github.oursharecar.domain.group
+
+import com.github.oursharecar.domain.common.Auditable
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
