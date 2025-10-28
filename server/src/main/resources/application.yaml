@@ -8,3 +8,9 @@ jwt:
   domain: "https://jwt-provider-domain/"
   audience: "jwt-audience"
   realm: "ktor sample app"
+
+mongodb:
+  connectionString: "mongodb://localhost:27017"
+  database: "oursharecar"
+  collections:
+    group: "groups"
