@@ -7,6 +7,7 @@ import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
+import io.ktor.server.util.getOrFail
 import kotlinx.coroutines.flow.toList
 
 fun Route.groupRoutes(groupRepository: GroupRepository) {
@@ -74,8 +75,8 @@ suspend fun RoutingContext.checkGroupClaimMatchesParameter(
     key: String,
     block: suspend RoutingContext.(String) -> Unit
 ) {
-    val groupId = call.parameters[key]
-    if (groupId == null || !call.isMemberOfGroup(groupId)) {
+    val groupId = call.parameters.getOrFail(key)
+    if (!call.isMemberOfGroup(groupId)) {
         call.respond(HttpStatusCode.Unauthorized)
         return
     }
