@@ -8,7 +8,7 @@ import com.mongodb.client.model.Sorts
 import com.mongodb.client.model.Updates
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
 import org.bson.conversions.Bson
 import kotlin.time.Clock
@@ -19,10 +19,10 @@ abstract class MongoRepository<ID, E : Any>(
     protected val collection: MongoCollection<E>,
     protected val idSelector: (E) -> ID
 ) : PagedRepository<ID, E> {
-    protected open fun baseFilter(): Bson = Filters.eq("audit.deletedAt", null)
+    protected open fun baseFilter(): Bson = Filters.eq("audit.deleted_at", null)
 
     override suspend fun findById(id: ID): E? {
-        return collection.find(Filters.and(baseFilter(), Filters.eq("_id", id))).limit(1).first()
+        return collection.find(Filters.and(baseFilter(), Filters.eq("_id", id))).limit(1).firstOrNull()
     }
 
     override suspend fun existsById(id: ID): Boolean {
@@ -43,7 +43,7 @@ abstract class MongoRepository<ID, E : Any>(
         val now = Clock.System.now()
         val result = collection.updateOne(
             Filters.and(baseFilter(), Filters.eq("_id", id)),
-            Updates.set("audit.deletedAt", now)
+            Updates.set("audit.deleted_at", now)
         )
         return result.matchedCount > 0
     }
@@ -54,7 +54,7 @@ abstract class MongoRepository<ID, E : Any>(
         val filter = baseFilter()
         val total = collection.countDocuments(filter)
         val items = collection.find(filter)
-            .sort(Sorts.descending("audit.createdAt"))
+            .sort(Sorts.descending("audit.created_at"))
             .skip((request.page - 1) * request.size)
             .limit(request.size)
             .toList()

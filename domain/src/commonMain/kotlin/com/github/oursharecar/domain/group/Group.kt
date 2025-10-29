@@ -7,6 +7,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Group(
+    @SerialName("_id")
     val id: String,
     val name: String,
     val slug: String,
