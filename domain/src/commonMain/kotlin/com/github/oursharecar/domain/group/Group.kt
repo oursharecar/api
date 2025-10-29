@@ -1,6 +1,7 @@
 package com.github.oursharecar.domain.group
 
 import com.github.oursharecar.domain.common.Auditable
+import com.github.oursharecar.domain.common.ID
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -8,11 +9,9 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Group(
     @SerialName("_id")
-    val id: String,
+    val id: ID<Group>? = null,
     val name: String,
     val slug: String,
-    @SerialName("created_by")
-    val createdBy: String,
     val settings: Settings,
     val audit: Auditable
 ) {

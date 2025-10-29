@@ -1,6 +1,7 @@
 package com.github.oursharecar.domain.common
 
 import kotlinx.coroutines.flow.Flow
+import kotlinx.serialization.Serializable
 
 data class PageRequest(val page: Int, val size: Int) {
     init {
@@ -16,15 +17,20 @@ data class Page<T>(
     val size: Int
 )
 
-interface Repository<ID, E> {
-    suspend fun findById(id: ID): E?
-    suspend fun existsById(id: ID): Boolean
-    suspend fun insert(entity: E): ID
-    suspend fun upsert(id: ID, entity: E): Boolean
-    suspend fun deleteById(id: ID): Boolean
+
+@JvmInline
+@Serializable
+value class ID<E>(val id: String)
+
+interface Repository<E> {
+    suspend fun findById(id: ID<E>): E?
+    suspend fun existsById(id: ID<E>): Boolean
+    suspend fun insert(entity: E): ID<E>
+    suspend fun upsert(id: ID<E>, entity: E): Boolean
+    suspend fun deleteById(id: ID<E>): Boolean
     fun findAll(): Flow<E>
 }
 
-interface PagedRepository<ID, E> : Repository<ID, E> {
+interface PagedRepository<E> : Repository<E> {
     suspend fun page(request: PageRequest): Page<E>
 }

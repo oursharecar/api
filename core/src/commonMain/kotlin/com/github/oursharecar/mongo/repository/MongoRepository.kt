@@ -1,5 +1,6 @@
 package com.github.oursharecar.mongo.repository
 
+import com.github.oursharecar.domain.common.ID
 import com.github.oursharecar.domain.common.Page
 import com.github.oursharecar.domain.common.PageRequest
 import com.github.oursharecar.domain.common.PagedRepository
@@ -15,31 +16,30 @@ import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
-abstract class MongoRepository<ID, E : Any>(
+abstract class MongoRepository<E : Any>(
     protected val collection: MongoCollection<E>,
-    protected val idSelector: (E) -> ID
-) : PagedRepository<ID, E> {
+) : PagedRepository<E> {
     protected open fun baseFilter(): Bson = Filters.eq("audit.deleted_at", null)
 
-    override suspend fun findById(id: ID): E? {
+    override suspend fun findById(id: ID<E>): E? {
         return collection.find(Filters.and(baseFilter(), Filters.eq("_id", id))).limit(1).firstOrNull()
     }
 
-    override suspend fun existsById(id: ID): Boolean {
+    override suspend fun existsById(id: ID<E>): Boolean {
         return findById(id) != null
     }
 
-    override suspend fun insert(entity: E): ID {
-        collection.insertOne(entity)
-        return idSelector(entity)
+    override suspend fun insert(entity: E): ID<E> {
+        val result = collection.insertOne(entity)
+        return ID(result.insertedId?.asString()?.value!!)
     }
 
-    override suspend fun upsert(id: ID, entity: E): Boolean {
+    override suspend fun upsert(id: ID<E>, entity: E): Boolean {
         val result = collection.replaceOne(Filters.and(baseFilter(), Filters.eq("_id", id)), entity)
         return result.matchedCount > 0 || result.upsertedId != null
     }
 
-    override suspend fun deleteById(id: ID): Boolean {
+    override suspend fun deleteById(id: ID<E>): Boolean {
         val now = Clock.System.now()
         val result = collection.updateOne(
             Filters.and(baseFilter(), Filters.eq("_id", id)),

@@ -10,9 +10,8 @@ import kotlinx.coroutines.flow.firstOrNull
 class GroupMongoRepository(
     database: MongoDatabase,
     collectionName: String
-) : MongoRepository<String, Group>(
+) : MongoRepository<Group>(
     database.getCollection<Group>(collectionName),
-    idSelector = { it.id }
 ), GroupRepository {
 
     override suspend fun findBySlug(slug: String): Group? {

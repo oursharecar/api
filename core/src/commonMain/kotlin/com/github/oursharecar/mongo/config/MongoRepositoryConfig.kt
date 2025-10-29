@@ -1,5 +1,7 @@
 package com.github.oursharecar.mongo.config
 
+import com.github.oursharecar.domain.common.ID
+import com.github.oursharecar.domain.group.Group
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import org.bson.codecs.configuration.CodecRegistries
@@ -21,7 +23,7 @@ fun MongoRepositoryConfig.toClientSettings(): MongoClientSettings {
 private val mongoCodecRegistryInstance: CodecRegistry =
     CodecRegistries.fromRegistries(
         MongoClientSettings.getDefaultCodecRegistry(),
-        CodecRegistries.fromProviders(KotlinInstantCodec),
+        CodecRegistries.fromProviders(KotlinInstantCodec, IDCodec<Group>(ID::class.java)),
     )
 
 internal fun mongoCodecRegistry(): CodecRegistry = mongoCodecRegistryInstance
