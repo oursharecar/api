@@ -1,9 +1,12 @@
 package com.github.oursharecar.server.routes
 
+import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.asResponse
+import com.github.oursharecar.server.models.newDomainObjectFromRequest
 import com.github.oursharecar.server.resources.Groups
+import com.github.slugify.Slugify
 import io.ktor.http.*
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.*
@@ -17,6 +20,8 @@ import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import kotlinx.coroutines.flow.toList
 
+private val slugify = Slugify.builder().build()
+
 fun Route.groupRoutes(groupRepository: GroupRepository) {
     get<Groups> {
         val groups = groupRepository.findAll().toList()
@@ -24,7 +29,8 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
     }
     post<Groups> {
         val request = call.receive<GroupCreateRequest>()
-        call.respond(request)
+        val id = groupRepository.insert(newDomainObjectFromRequest(request, ""))
+        call.respond(id.id)
     }
 
     get<Groups.Id> { group ->

@@ -29,6 +29,7 @@ dependencies {
     implementation(libs.ktor.server.cio)
     implementation(libs.logback.classic)
     implementation(libs.ktor.server.config.yaml)
+    implementation(libs.slugify)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.runner.junit5)

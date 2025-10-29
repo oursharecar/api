@@ -10,6 +10,6 @@ data class GroupResponse(
 )
 
 fun Group.asResponse() = GroupResponse(
-    id = this.id,
+    id = this.id?.id ?: "",
     name = this.name,
 )

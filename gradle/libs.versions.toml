@@ -42,6 +42,7 @@ mongodb-bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version = "5.4.0" 
 mongo-java-server = { module = "de.bwaldvogel:mongo-java-server", version = "1.46.0" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
+slugify = { module = "com.github.slugify:slugify", version = "3.0.6" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
