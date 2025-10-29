@@ -1,14 +1,12 @@
 package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.server.plugins.groups
 import io.ktor.http.HttpStatusCode
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.JWTPrincipal
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.util.pipeline.PipelineContext
 import kotlinx.coroutines.flow.toList
 
 fun Route.groupRoutes(groupRepository: GroupRepository) {
@@ -70,9 +68,9 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
 }
 
 fun ApplicationCall.isMemberOfGroup(groupId: String?): Boolean =
-    principal<JWTPrincipal>()?.payload?.groups?.contains(groupId) == true
+    principal<JWTPrincipal>()?.payload?.getClaim("groups")?.asList(String::class.java)?.contains(groupId) == true
 
-private suspend inline fun PipelineContext<Unit, ApplicationCall>.withGroupMember(
+private suspend inline fun RoutingContext.withGroupMember(
     block: suspend (String) -> Unit
 ) {
     val groupId = call.parameters["id"]
