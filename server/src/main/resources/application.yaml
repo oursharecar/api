@@ -11,6 +11,10 @@ security:
     audience: "jwt-audience"
     realm: "ktor sample app"
 
+  auth0:
+    issuer: "https://jwt-provider-domain/"
+    audience: "jwt-audience"
+
 mongodb:
   connectionString: "mongodb://localhost:27017"
   database: "oursharecar"
