@@ -1,6 +1,9 @@
 package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.domain.group.GroupRepository
+import com.github.oursharecar.server.models.GroupCreateRequest
+import com.github.oursharecar.server.models.asResponse
+import com.github.oursharecar.server.resources.Groups
 import io.ktor.http.*
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.*
@@ -20,14 +23,14 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
         call.respond(groups)
     }
     post<Groups> {
-        val request = call.receive<CreateGroupRequest>()
+        val request = call.receive<GroupCreateRequest>()
         call.respond(request)
     }
 
     get<Groups.Id> { group ->
         val result = groupRepository.findById(group.id)
         if (result != null) {
-            call.respond(result)
+            call.respond(result.asResponse())
         } else {
             call.respond(HttpStatusCode.NotFound)
         }

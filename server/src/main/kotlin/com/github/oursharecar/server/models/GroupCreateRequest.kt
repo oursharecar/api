@@ -1,9 +1,9 @@
-package com.github.oursharecar.server.routes
+package com.github.oursharecar.server.models
 
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class CreateGroupRequest(
+data class GroupCreateRequest(
     val name: String,
     val members: List<String> = emptyList()
 )

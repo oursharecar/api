@@ -1,4 +1,5 @@
-package com.github.oursharecar.server.routes
+package com.github.oursharecar.server.resources
+
 import io.ktor.resources.Resource
 import kotlinx.serialization.Serializable
 
