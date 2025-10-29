@@ -1,23 +1,22 @@
 package com.github.oursharecar.server
 
+import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import io.ktor.client.request.*
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.*
 import io.ktor.server.testing.*
-import kotlin.test.Test
-import kotlin.test.assertEquals
-import kotlin.test.assertTrue
 
-class ApplicationTest {
+class ApplicationTest : FunSpec({
 
-    @Test
-    fun testRoot() = testApplication {
-        application {
-            module()
+    test("GET / returns health status payload") {
+        testApplication {
+            application { module() }
+
+            val response = client.get("/")
+            response.status shouldBe HttpStatusCode.OK
+            response.bodyAsText() shouldContain "\"status\":\"ok\""
         }
-        val response = client.get("/")
-        assertEquals(HttpStatusCode.OK, response.status)
-        assertTrue(response.bodyAsText().contains("\"status\":\"ok\""))
     }
-
-}
+})
