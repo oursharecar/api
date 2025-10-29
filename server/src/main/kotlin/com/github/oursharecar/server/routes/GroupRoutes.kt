@@ -13,20 +13,6 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
 import kotlinx.coroutines.flow.toList
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class CreateGroupRequest(
-    val name: String,
-    val members: List<String> = emptyList()
-)
-
-@Serializable
-data class Group(
-    val id: String,
-    val name: String,
-    val members: List<String> = emptyList()
-)
 
 fun Route.groupRoutes(groupRepository: GroupRepository) {
     get<Groups> {
