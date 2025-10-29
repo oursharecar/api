@@ -22,43 +22,43 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
 
         authenticate("jwt-groups-claims") {
             get("/{id}") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement get group by ID
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             patch("/{id}") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement group update
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             delete("/{id}") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement group deletion
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             get("/{id}/members") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement get group members
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             post("/{id}/members") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement add group member
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             patch("/{id}/members/{memberId}") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement update group member
                     call.respond(HttpStatusCode.NotImplemented)
                 }
             }
             delete("/{id}/members/{memberId}") {
-                withGroupMember {
+                checkGroupClaimMatchesParameter("id") {
                     // TODO: Implement remove group member
                     call.respond(HttpStatusCode.NotImplemented)
                 }
@@ -70,10 +70,11 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
 fun ApplicationCall.isMemberOfGroup(groupId: String?): Boolean =
     principal<JWTPrincipal>()?.payload?.getClaim("groups")?.asList(String::class.java)?.contains(groupId) == true
 
-private suspend inline fun RoutingContext.withGroupMember(
-    block: suspend (String) -> Unit
+suspend fun RoutingContext.checkGroupClaimMatchesParameter(
+    key: String,
+    block: suspend RoutingContext.(String) -> Unit
 ) {
-    val groupId = call.parameters["id"]
+    val groupId = call.parameters[key]
     if (groupId == null || !call.isMemberOfGroup(groupId)) {
         call.respond(HttpStatusCode.Unauthorized)
         return
