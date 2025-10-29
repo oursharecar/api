@@ -1,5 +1,6 @@
 package com.github.oursharecar.server.plugins
 
+import com.github.oursharecar.domain.common.DomainSerializersModule
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.plugins.contentnegotiation.*
@@ -12,6 +13,7 @@ fun Application.configureSerialization() {
                 ignoreUnknownKeys = true
                 encodeDefaults = true
                 prettyPrint = false
+                serializersModule = DomainSerializersModule
             }
         )
     }

@@ -2,14 +2,14 @@ package com.github.oursharecar.domain.group
 
 import com.github.oursharecar.domain.common.Auditable
 import com.github.oursharecar.domain.common.ID
-
+import kotlinx.serialization.Contextual
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 data class Group(
     @SerialName("_id")
-    val id: ID<Group>? = null,
+    val id: @Contextual ID<Group>? = null,
     val name: String,
     val slug: String,
     val settings: Settings,

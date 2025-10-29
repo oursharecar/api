@@ -1,7 +1,9 @@
 package com.github.oursharecar.mongo.config
 
 import com.github.oursharecar.domain.common.ID
+import org.bson.BsonInvalidOperationException
 import org.bson.BsonReader
+import org.bson.BsonType
 import org.bson.BsonWriter
 import org.bson.codecs.Codec
 import org.bson.codecs.DecoderContext
@@ -15,7 +17,15 @@ class IDCodec<E>(private val clazz: Class<ID<*>>) : Codec<ID<*>>, CodecProvider 
     }
 
     override fun decode(reader: BsonReader, decoderContext: DecoderContext): ID<E> {
-        return ID(reader.readString())
+        return try {
+            ID(reader.readString())
+        } catch (unexpected: BsonInvalidOperationException) {
+            if (reader.currentBsonType == BsonType.OBJECT_ID) {
+                ID(reader.readObjectId().toHexString())
+            } else {
+                throw unexpected
+            }
+        }
     }
 
     override fun getEncoderClass(): Class<ID<*>> = clazz

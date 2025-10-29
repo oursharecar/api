@@ -11,7 +11,11 @@ import com.mongodb.kotlin.client.coroutine.MongoCollection
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.toList
+import org.bson.BsonInvalidOperationException
+import org.bson.BsonType
+import org.bson.BsonValue
 import org.bson.conversions.Bson
+import org.bson.types.ObjectId
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
 
@@ -22,7 +26,10 @@ abstract class MongoRepository<E : Any>(
     protected open fun baseFilter(): Bson = Filters.eq("audit.deleted_at", null)
 
     override suspend fun findById(id: ID<E>): E? {
-        return collection.find(Filters.and(baseFilter(), Filters.eq("_id", id))).limit(1).firstOrNull()
+        return collection
+            .find(Filters.and(baseFilter(), idFilter(id)))
+            .limit(1)
+            .firstOrNull()
     }
 
     override suspend fun existsById(id: ID<E>): Boolean {
@@ -31,18 +38,19 @@ abstract class MongoRepository<E : Any>(
 
     override suspend fun insert(entity: E): ID<E> {
         val result = collection.insertOne(entity)
-        return ID(result.insertedId?.asString()?.value!!)
+        val insertedId = result.insertedId ?: throw IllegalStateException("inserted document is missing _id")
+        return ID(insertedId.asStringId())
     }
 
     override suspend fun upsert(id: ID<E>, entity: E): Boolean {
-        val result = collection.replaceOne(Filters.and(baseFilter(), Filters.eq("_id", id)), entity)
+        val result = collection.replaceOne(Filters.and(baseFilter(), idFilter(id)), entity)
         return result.matchedCount > 0 || result.upsertedId != null
     }
 
     override suspend fun deleteById(id: ID<E>): Boolean {
         val now = Clock.System.now()
         val result = collection.updateOne(
-            Filters.and(baseFilter(), Filters.eq("_id", id)),
+            Filters.and(baseFilter(), idFilter(id)),
             Updates.set("audit.deleted_at", now)
         )
         return result.matchedCount > 0
@@ -59,5 +67,19 @@ abstract class MongoRepository<E : Any>(
             .limit(request.size)
             .toList()
         return Page(items, total, request.page, request.size)
+    }
+
+    private fun idFilter(id: ID<E>): Bson {
+        val filters = mutableListOf<Bson>(Filters.eq("_id", id.id))
+        if (ObjectId.isValid(id.id)) {
+            filters += Filters.eq("_id", ObjectId(id.id))
+        }
+        return if (filters.size == 1) filters.first() else Filters.or(filters)
+    }
+
+    private fun BsonValue.asStringId(): String = when (bsonType) {
+        BsonType.STRING -> asString().value
+        BsonType.OBJECT_ID -> asObjectId().value.toHexString()
+        else -> throw BsonInvalidOperationException("Unsupported _id type: $bsonType")
     }
 }

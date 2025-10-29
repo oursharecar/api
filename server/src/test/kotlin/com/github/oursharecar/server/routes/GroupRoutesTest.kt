@@ -1,43 +1,33 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.domain.common.Auditable
-import com.github.oursharecar.domain.common.ID
-import com.github.oursharecar.domain.common.Page
-import com.github.oursharecar.domain.common.PageRequest
+import com.github.oursharecar.domain.common.*
 import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.GroupResponse
 import com.github.oursharecar.server.models.asResponse
-import io.ktor.client.request.get
-import io.ktor.client.request.header
-import io.ktor.client.request.post
-import io.ktor.client.request.parameter
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
-import io.ktor.http.ContentType
-import io.ktor.http.HttpHeaders
-import io.ktor.http.HttpStatusCode
-import io.ktor.serialization.kotlinx.json.json
-import io.ktor.server.application.install
-import io.ktor.server.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.server.resources.Resources
-import io.ktor.server.routing.routing
-import io.ktor.server.testing.testApplication
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
+import io.ktor.http.*
+import io.ktor.serialization.kotlinx.json.*
+import io.ktor.server.application.*
+import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.resources.*
+import io.ktor.server.routing.*
+import io.ktor.server.testing.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.asFlow
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-import org.junit.jupiter.api.Test
 
 class GroupRoutesTest {
 
     private val json = Json {
         encodeDefaults = true
+        serializersModule = DomainSerializersModule
     }
 
     @Test
