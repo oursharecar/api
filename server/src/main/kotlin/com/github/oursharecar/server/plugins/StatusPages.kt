@@ -1,6 +1,7 @@
 package com.github.oursharecar.server.plugins
 
 import io.ktor.http.*
+import io.ktor.serialization.ContentConvertException
 import io.ktor.server.application.*
 import io.ktor.server.plugins.*
 import io.ktor.server.plugins.statuspages.*
@@ -15,11 +16,20 @@ fun Application.configureStatusPages() {
             when (cause) {
                 is BadRequestException -> call.respond(
                     HttpStatusCode.BadRequest,
-                    message = mapOf("error" to cause.message)
+                    message = mapOf("error" to detailedErrorMessage(cause))
                 )
 
                 else -> call.respond(HttpStatusCode.InternalServerError, mapOf("error" to "internal_server_error"))
             }
         }
+    }
+}
+
+fun detailedErrorMessage(e: BadRequestException): String {
+    val cause = e.cause
+
+    return when(cause) {
+        is ContentConvertException -> "Failed to convert content: ${cause.message}"
+        else -> e.message ?: "Bad request."
     }
 }
