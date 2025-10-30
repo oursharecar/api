@@ -1,9 +1,8 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
+import com.github.oursharecar.mongo.group.MongoGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.asResponse
 import com.github.oursharecar.server.models.newDomainObjectFromRequest
 import com.github.oursharecar.server.resources.Groups
 import com.github.slugify.Slugify
@@ -11,7 +10,7 @@ import io.ktor.http.*
 import io.ktor.server.application.ApplicationCall
 import io.ktor.server.auth.*
 import io.ktor.server.auth.jwt.*
-import io.ktor.server.request.receive
+import io.ktor.server.request.*
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
 import io.ktor.server.resources.post
@@ -22,7 +21,7 @@ import kotlinx.coroutines.flow.toList
 
 private val slugify = Slugify.builder().build()
 
-fun Route.groupRoutes(groupRepository: GroupRepository) {
+fun Route.groupRoutes(groupRepository: GroupRepository<MongoGroup>) {
     get<Groups> {
         val groups = groupRepository.findAll().toList()
         call.respond(groups)
@@ -36,7 +35,7 @@ fun Route.groupRoutes(groupRepository: GroupRepository) {
     get<Groups.Id> { group ->
         val result = groupRepository.findById(group.id)
         if (result != null) {
-            call.respond(result.asResponse())
+            call.respond(result)
         } else {
             call.respond(HttpStatusCode.NotFound)
         }

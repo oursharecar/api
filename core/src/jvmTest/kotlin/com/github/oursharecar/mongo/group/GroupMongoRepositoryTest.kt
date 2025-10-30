@@ -3,7 +3,6 @@
 package com.github.oursharecar.mongo.group
 
 import com.github.oursharecar.domain.common.Auditable
-import com.github.oursharecar.domain.common.ID
 import com.github.oursharecar.domain.common.PageRequest
 import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.mongo.config.mongoCodecRegistry
@@ -14,8 +13,6 @@ import com.mongodb.kotlin.client.coroutine.MongoClient
 import com.mongodb.kotlin.client.coroutine.MongoDatabase
 import de.bwaldvogel.mongo.MongoServer
 import de.bwaldvogel.mongo.backend.memory.MemoryBackend
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.flow.toList
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.booleans.shouldBeFalse
 import io.kotest.matchers.booleans.shouldBeTrue
@@ -23,6 +20,8 @@ import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
+import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.toList
 import org.bson.Document
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
@@ -57,47 +56,47 @@ class GroupMongoRepositoryTest : FunSpec() {
         }
 
         test("insert and find by id returns persisted entity") {
-            val group = sampleGroup(id = ID("group-1"))
+            val group: MongoGroup = sampleGroup()
 
-            repository.insert(group)
+            val id = repository.insert(group)
 
-            val loaded = repository.findById(group.id!!).shouldNotBeNull()
+            val loaded = repository.findById(id).shouldNotBeNull()
             loaded shouldBe group
-            repository.existsById(group.id!!).shouldBeTrue()
+            repository.existsById(id).shouldBeTrue()
         }
 
         test("find by slug honors soft delete filter") {
-            val group = sampleGroup(id = ID("group-2"), slug = "slug-2")
-            repository.insert(group)
+            val group = sampleGroup()
+            val id = repository.insert(group)
 
             repository.findBySlug(group.slug).shouldNotBeNull()
             repository.existsBySlug(group.slug).shouldBeTrue()
 
-            repository.deleteById(group.id!!).shouldBeTrue()
+            repository.deleteById(id).shouldBeTrue()
 
             repository.findBySlug(group.slug).shouldBeNull()
             repository.existsBySlug(group.slug).shouldBeFalse()
         }
 
         test("upsert updates existing entity") {
-            val group = sampleGroup(id = ID("group-3"), name = "Initial Name")
-            repository.insert(group)
+            val group = sampleGroup()
+            val id = repository.insert(group)
 
             val updated = group.copy(name = "Updated Name")
-            repository.upsert(group.id!!, updated).shouldBeTrue()
+            repository.upsert(id, updated).shouldBeTrue()
 
-            val reloaded = repository.findById(group.id!!).shouldNotBeNull()
+            val reloaded = repository.findById(id).shouldNotBeNull()
             reloaded.name shouldBe "Updated Name"
         }
 
         test("delete by id marks entity and excludes from queries") {
-            val group = sampleGroup(id = ID("group-4"))
-            repository.insert(group)
+            val group = sampleGroup()
+            val id = repository.insert(group)
 
-            repository.deleteById(group.id!!).shouldBeTrue()
+            repository.deleteById(id).shouldBeTrue()
 
-            repository.findById(group.id!!).shouldBeNull()
-            repository.existsById(group.id!!).shouldBeFalse()
+            repository.findById(id).shouldBeNull()
+            repository.existsById(id).shouldBeFalse()
             repository.findAll().toList().shouldBeEmpty()
 
             val auditDocument = database
@@ -106,33 +105,33 @@ class GroupMongoRepositoryTest : FunSpec() {
                 .firstOrNull()
                 .shouldNotBeNull()
             val audit = auditDocument.get("audit", Document::class.java).shouldNotBeNull()
-            audit.get("deleted_at").shouldNotBeNull()
+            audit["deleted_at"].shouldNotBeNull()
         }
 
         test("page returns most recent groups first") {
             val groups = listOf(
-                sampleGroup(id = ID("group-5"), createdAt = instantAt(1_000)),
-                sampleGroup(id = ID("group-6"), createdAt = instantAt(2_000)),
-                sampleGroup(id = ID("group-7"), createdAt = instantAt(3_000))
+                sampleGroup(createdAt = instantAt(1_000)),
+                sampleGroup(createdAt = instantAt(2_000)),
+                sampleGroup(createdAt = instantAt(3_000))
             )
-            groups.forEach { repository.insert(it) }
+            val ids = groups.map { repository.insert(it) }
 
             val firstPage = repository.page(PageRequest(page = 1, size = 2))
             firstPage.total shouldBe 3
-            firstPage.items.map { it.id } shouldBe listOf(ID("group-7"), ID("group-6"))
+            firstPage.items.map { it.id } shouldBe ids.take(2)
 
             val secondPage = repository.page(PageRequest(page = 2, size = 2))
-            secondPage.items.map { it.id } shouldBe listOf(ID("group-5"))
+            secondPage.items.map { it.id } shouldBe ids.takeLast(1)
         }
     }
 
     private fun sampleGroup(
-        id: ID<Group>,
-        name: String = "Group $id",
-        slug: String = "$id-slug",
+        index: Int = 1,
+        name: String = "Group $index",
+        slug: String = "$index-slug",
         createdAt: Instant = instantAt(0),
         updatedAt: Instant = createdAt
-    ): Group {
+    ): MongoGroup {
         val audit = Auditable(
             createdAt = createdAt,
             createdBy = "system",
@@ -146,8 +145,7 @@ class GroupMongoRepositoryTest : FunSpec() {
             memberLimit = 10
         )
 
-        return Group(
-            id = id,
+        return MongoGroup(
             name = name,
             slug = slug,
             settings = settings,

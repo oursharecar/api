@@ -2,6 +2,7 @@ package com.github.oursharecar.server.models
 
 import com.github.oursharecar.domain.common.Auditable
 import com.github.oursharecar.domain.group.Group
+import com.github.oursharecar.mongo.group.MongoGroup
 import com.github.oursharecar.server.utils.GlobalSlugify
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
@@ -14,8 +15,9 @@ data class GroupCreateRequest(
 )
 
 @OptIn(ExperimentalTime::class)
-fun newDomainObjectFromRequest(request: GroupCreateRequest, createdBy: String): Group = with(request) {
-    Group(
+fun newDomainObjectFromRequest(request: GroupCreateRequest, createdBy: String): MongoGroup = with(request) {
+    MongoGroup(
+        id = null,
         name = name,
         slug = GlobalSlugify.slugify(name),
         settings = Group.Settings(
