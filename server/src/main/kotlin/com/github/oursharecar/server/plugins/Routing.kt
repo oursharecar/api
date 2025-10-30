@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.plugins
 
+import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import com.github.oursharecar.server.routes.groupRoutes
 import com.github.oursharecar.server.routes.healthRoutes
 import io.ktor.server.application.*
@@ -10,7 +10,7 @@ import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.resources.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(groupRepository: GroupRepository<MongoGroup>) {
+fun Application.configureRouting(groupRepository: GroupRepository<Group>) {
     install(DefaultHeaders) {
         header("X-Service", "oursharecar-api")
     }

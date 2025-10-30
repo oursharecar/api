@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.routes
 
+import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.newDomainObjectFromRequest
 import com.github.oursharecar.server.resources.Groups
@@ -21,7 +21,7 @@ import kotlinx.coroutines.flow.toList
 
 private val slugify = Slugify.builder().build()
 
-fun Route.groupRoutes(groupRepository: GroupRepository<MongoGroup>) {
+fun Route.groupRoutes(groupRepository: GroupRepository<Group>) {
     get<Groups> {
         val groups = groupRepository.findAll().toList()
         call.respond(groups)
