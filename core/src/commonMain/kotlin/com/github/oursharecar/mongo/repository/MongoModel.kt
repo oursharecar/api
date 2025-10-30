@@ -1,5 +1,7 @@
 package com.github.oursharecar.mongo.repository
 
-interface MongoModel<T> : HasObjectId {
+import com.github.oursharecar.domain.group.DomainModel
+
+interface MongoModel<T : DomainModel> : HasObjectId {
     fun withoutId(): T
 }
