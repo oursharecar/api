@@ -3,7 +3,9 @@ package com.github.oursharecar.domain.group
 import com.github.oursharecar.domain.common.Auditable
 import kotlinx.serialization.Serializable
 
-interface Group {
+interface DomainModel
+
+interface Group : DomainModel {
     val name: String
     val slug: String
     val settings: Settings

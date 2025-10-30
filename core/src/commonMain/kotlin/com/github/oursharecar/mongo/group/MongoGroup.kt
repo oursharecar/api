@@ -14,7 +14,8 @@ data class MongoGroup(
     override val settings: Group.Settings,
     override val audit: Auditable,
     @SerialName("_id")
-    override val id: ObjectId
+    override val id: ObjectId? = null,
 ) : Group, MongoModel<Group> {
+    constructor(group: Group) : this(group.name, group.slug, group.settings, group.audit)
     override fun withoutId(): Group = this
 }
