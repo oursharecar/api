@@ -17,5 +17,6 @@ data class MongoGroup(
     override val id: ObjectId? = null,
 ) : Group, MongoModel<Group> {
     constructor(group: Group) : this(group.name, group.slug, group.settings, group.audit)
-    override fun withoutId(): Group = this
+
+    override fun dropId(): Group = this
 }

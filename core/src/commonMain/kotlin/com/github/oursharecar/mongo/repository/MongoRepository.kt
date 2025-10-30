@@ -11,7 +11,7 @@ abstract class MongoRepository<E : DomainModel, M : MongoModel<E>>(val entityCre
     abstract val repo: MongoCollectionRepository<M>
 
     override suspend fun findById(id: ID<E>): E? {
-        return repo.findById(id.toObjectId())?.withoutId()
+        return repo.findById(id.toObjectId())?.dropId()
     }
 
     override suspend fun existsById(id: ID<E>): Boolean {
@@ -31,7 +31,7 @@ abstract class MongoRepository<E : DomainModel, M : MongoModel<E>>(val entityCre
     }
 
     override fun findAll(): Flow<E> {
-        return repo.findAll().map { it.withoutId() }
+        return repo.findAll().map { it.dropId() }
     }
 }
 
