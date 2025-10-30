@@ -1,6 +1,6 @@
 @file:OptIn(ExperimentalTime::class)
 
-package com.github.oursharecar.mongo.group
+package com.github.oursharecar.mongo.oldGroup
 
 import com.github.oursharecar.domain.common.Auditable
 import com.github.oursharecar.domain.common.PageRequest

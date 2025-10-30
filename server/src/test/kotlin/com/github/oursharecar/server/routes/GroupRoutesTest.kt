@@ -3,7 +3,7 @@ package com.github.oursharecar.server.routes
 import com.github.oursharecar.domain.common.*
 import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.mongo.group.MongoGroup
+import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.GroupResponse
 import com.github.oursharecar.server.models.asResponse

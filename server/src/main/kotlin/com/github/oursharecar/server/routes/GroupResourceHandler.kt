@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.mongo.group.MongoGroup
+import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.newDomainObjectFromRequest
 import com.github.oursharecar.server.resources.Groups

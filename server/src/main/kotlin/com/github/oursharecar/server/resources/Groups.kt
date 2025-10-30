@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.resources
 
 import com.github.oursharecar.domain.common.ID
-import com.github.oursharecar.mongo.group.MongoGroup
+import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import io.ktor.resources.*
 import kotlinx.serialization.Serializable
 

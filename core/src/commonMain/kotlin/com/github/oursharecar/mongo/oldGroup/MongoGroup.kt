@@ -1,11 +1,10 @@
-package com.github.oursharecar.mongo.group
+package com.github.oursharecar.mongo.oldGroup
 
 import com.github.oursharecar.domain.common.Auditable
+import com.github.oursharecar.domain.common.ID
 import com.github.oursharecar.domain.group.Group
-import com.github.oursharecar.mongo.repository.MongoModel
-import kotlinx.serialization.SerialName
+import com.github.oursharecar.mongo.repository.HasId
 import kotlinx.serialization.Serializable
-import org.bson.types.ObjectId
 
 @Serializable
 data class MongoGroup(
@@ -13,8 +12,5 @@ data class MongoGroup(
     override val slug: String,
     override val settings: Group.Settings,
     override val audit: Auditable,
-    @SerialName("_id")
-    override val id: ObjectId
-) : Group, MongoModel<Group> {
-    override fun withoutId(): Group = this
-}
+    override val id: ID<MongoGroup>? = null,
+) : Group, HasId<MongoGroup>

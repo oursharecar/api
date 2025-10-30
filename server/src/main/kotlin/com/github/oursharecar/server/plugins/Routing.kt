@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.plugins
 
 import com.github.oursharecar.domain.group.GroupRepository
-import com.github.oursharecar.mongo.group.MongoGroup
+import com.github.oursharecar.mongo.oldGroup.MongoGroup
 import com.github.oursharecar.server.routes.groupRoutes
 import com.github.oursharecar.server.routes.healthRoutes
 import io.ktor.server.application.*
