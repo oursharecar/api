@@ -1,13 +1,12 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.domain.common.*
-import com.github.oursharecar.domain.group.Group
-import com.github.oursharecar.domain.group.GroupRepository
+import com.github.oursharecar.server.models.Auditable
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.GroupResource
-import com.github.oursharecar.server.models.asResource
+import com.github.oursharecar.server.models.ID
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
+import com.github.oursharecar.server.repository.GroupRepository
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -30,18 +29,18 @@ class GroupRoutesTest {
     private val json = Json {
         ignoreUnknownKeys = true
         encodeDefaults = true
-        serializersModule = DomainSerializersModule
     }
 
     @Test
     fun `GET groups returns all available groups`() = testApplication {
         val repository = FakeGroupRepository()
-        val firstGroup = TestGroup(
+        val firstGroup = GroupResource(
+            id = null,
             name = "Downtown Drivers",
             slug = "downtown-drivers",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PUBLIC,
-                joinMode = Group.JoinMode.OPEN,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PUBLIC,
+                joinMode = GroupResource.JoinMode.OPEN,
                 memberLimit = 50
             ),
             audit = audit(
@@ -51,12 +50,13 @@ class GroupRoutesTest {
                 updatedAtMillis = 2_000L
             )
         )
-        val secondGroup = TestGroup(
+        val secondGroup = GroupResource(
+            id = null,
             name = "Weekend Riders",
             slug = "weekend-riders",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PRIVATE,
-                joinMode = Group.JoinMode.INVITE,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PRIVATE,
+                joinMode = GroupResource.JoinMode.INVITE,
                 memberLimit = 10
             ),
             audit = audit(
@@ -79,7 +79,10 @@ class GroupRoutesTest {
         assertEquals(HttpStatusCode.OK, response.status)
         val decoded = json.decodeFromString<List<GroupResource>>(response.bodyAsText())
         assertEquals(
-            listOf(firstGroup.asResource(), secondGroup.asResource()),
+            listOf(
+                firstGroup.copy(id = ID("group-1")),
+                secondGroup.copy(id = ID("group-2"))
+            ),
             decoded
         )
     }
@@ -87,12 +90,13 @@ class GroupRoutesTest {
     @Test
     fun `GET groups id returns existing group`() = testApplication {
         val repository = FakeGroupRepository()
-        val group = TestGroup(
+        val group = GroupResource(
+            id = null,
             name = "Neighborhood Carpool",
             slug = "neighborhood-carpool",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PUBLIC,
-                joinMode = Group.JoinMode.REQUEST,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PUBLIC,
+                joinMode = GroupResource.JoinMode.REQUEST,
                 memberLimit = 25
             ),
             audit = audit(
@@ -113,7 +117,7 @@ class GroupRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val decoded = json.decodeFromString<GroupResource>(response.bodyAsText())
-        assertEquals(group.asResource(), decoded)
+        assertEquals(group.copy(id = ID("group-42")), decoded)
     }
 
     @Test
@@ -153,7 +157,7 @@ class GroupRoutesTest {
         val createdId = response.bodyAsText()
         assertTrue(createdId.startsWith("group-"))
 
-        val stored = runBlocking { repository.findById(ID<Group>(createdId)) }
+        val stored = runBlocking { repository.findById(ID<GroupResource>(createdId)) }
         assertNotNull(stored)
         assertEquals("Late Night Cruisers", stored.name)
         assertEquals(GlobalSlugify.slugify("Late Night Cruisers"), stored.slug)
@@ -172,71 +176,56 @@ class GroupRoutesTest {
     )
 }
 
-private data class TestGroup(
-    override val name: String,
-    override val slug: String,
-    override val settings: Group.Settings,
-    override val audit: Auditable
-) : Group
-
-private class FakeGroupRepository : GroupRepository<Group> {
-    private val storage = linkedMapOf<ID<Group>, Group>()
-    private val slugIndex = mutableMapOf<String, ID<Group>>()
+private class FakeGroupRepository : GroupRepository {
+    private val storage = linkedMapOf<ID<GroupResource>, GroupResource>()
+    private val slugIndex = mutableMapOf<String, ID<GroupResource>>()
     private var nextId = 1
 
-    fun seed(idValue: String, group: Group): ID<Group> {
-        val id = ID<Group>(idValue)
-        storage[id] = group
-        slugIndex[group.slug] = id
+    fun seed(idValue: String, group: GroupResource): ID<GroupResource> {
+        val id = ID<GroupResource>(idValue)
+        val resource = group.copy(id = id)
+        storage[id] = resource
+        slugIndex[resource.slug] = id
         updateCounter(idValue)
         return id
     }
 
-    override suspend fun findById(id: ID<Group>): Group? = storage[id]
+    override suspend fun findById(id: ID<GroupResource>): GroupResource? = storage[id]
 
-    override suspend fun existsById(id: ID<Group>): Boolean = storage.containsKey(id)
+    override suspend fun existsById(id: ID<GroupResource>): Boolean = storage.containsKey(id)
+    override suspend fun findBySlug(slug: String): GroupResource? {
+        TODO("Not yet implemented")
+    }
 
-    override suspend fun insert(entity: Group): ID<Group> {
-        var id: ID<Group>
+    override suspend fun existsBySlug(slug: String): Boolean {
+        TODO("Not yet implemented")
+    }
+
+    override suspend fun insert(entity: GroupResource): ID<GroupResource> {
+        var id: ID<GroupResource>
         do {
             val idValue = "group-${nextId++}"
-            id = ID<Group>(idValue)
+            id = ID(idValue)
         } while (storage.containsKey(id))
 
-        storage[id] = entity
-        slugIndex[entity.slug] = id
+        val resource = entity.copy(id = id)
+        storage[id] = resource
+        slugIndex[resource.slug] = id
         return id
     }
 
-    override suspend fun upsert(id: ID<Group>, entity: Group): Boolean {
-        storage[id] = entity
-        slugIndex[entity.slug] = id
+    override suspend fun upsert(id: ID<GroupResource>, entity: GroupResource): Boolean {
+        val resource = entity.copy(id = id)
+        storage[id] = resource
+        slugIndex[resource.slug] = id
         return true
     }
 
-    override suspend fun deleteById(id: ID<Group>): Boolean = storage.remove(id) != null
+    override suspend fun deleteById(id: ID<GroupResource>): Boolean = storage.remove(id) != null
 
-    override fun findAll(): Flow<Group> = flow {
+    override fun findAll(): Flow<GroupResource> = flow {
         storage.values.forEach { emit(it) }
     }
-
-    override suspend fun page(request: PageRequest): Page<Group> {
-        val items = storage.values.toList()
-        val fromIndex = ((request.page - 1) * request.size).coerceAtLeast(0)
-        val toIndex = (fromIndex + request.size).coerceAtMost(items.size)
-        val pagedItems = if (fromIndex >= items.size) emptyList() else items.subList(fromIndex, toIndex)
-
-        return Page(
-            items = pagedItems,
-            total = items.size.toLong(),
-            page = request.page,
-            size = request.size
-        )
-    }
-
-    override suspend fun findBySlug(slug: String): Group? = slugIndex[slug]?.let { storage[it] }
-
-    override suspend fun existsBySlug(slug: String): Boolean = slugIndex.containsKey(slug)
 
     private fun updateCounter(idValue: String) {
         val numericSuffix = idValue.substringAfterLast('-', "")

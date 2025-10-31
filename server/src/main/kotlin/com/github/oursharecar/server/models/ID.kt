@@ -2,8 +2,7 @@ package com.github.oursharecar.server.models
 
 import kotlinx.serialization.Serializable
 
+@JvmInline
 @Serializable
-data class GroupResponse(
-    val id: String,
-    val name: String,
-)
+value class ID<E>(val id: String)
+

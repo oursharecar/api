@@ -1,10 +1,8 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.domain.group.Group
-import com.github.oursharecar.domain.group.GroupRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.asResource
-import com.github.oursharecar.server.models.newDomainObjectFromRequest
+import com.github.oursharecar.server.models.buildResource
+import com.github.oursharecar.server.repository.GroupRepository
 import com.github.oursharecar.server.resources.Groups
 import com.github.slugify.Slugify
 import io.ktor.http.*
@@ -18,26 +16,26 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import io.ktor.server.util.*
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.toList
 
 private val slugify = Slugify.builder().build()
 
-fun Route.groupRoutes(groupRepository: GroupRepository<Group>) {
+fun Route.groupRoutes(groupRepository: GroupRepository) {
     get<Groups> {
-        val groups = groupRepository.findAll().map { it.asResource() }.toList()
+        val groups = groupRepository.findAll().toList()
         call.respond(groups)
     }
     post<Groups> {
         val request = call.receive<GroupCreateRequest>()
-        val id = groupRepository.insert(newDomainObjectFromRequest(request, ""))
+        val sub = "sub(placeholder)"
+        val id = groupRepository.insert(request.buildResource(sub))
         call.respond(id.id)
     }
 
     get<Groups.Id> { group ->
         val result = groupRepository.findById(group.id)
         if (result != null) {
-            call.respond(result.asResource())
+            call.respond(result)
         } else {
             call.respond(HttpStatusCode.NotFound)
         }

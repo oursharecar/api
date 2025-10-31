@@ -1,6 +1,4 @@
-@file:OptIn(ExperimentalTime::class)
-
-package com.github.oursharecar.domain.common
+package com.github.oursharecar.server.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -11,6 +9,7 @@ import kotlin.time.Instant
 /**
  * Represents audit metadata tracked for persisted entities.
  */
+@OptIn(ExperimentalTime::class)
 @Serializable
 data class Auditable(
     @Serializable(with = InstantComponentSerializer::class)
@@ -28,5 +27,3 @@ data class Auditable(
     val deletedAt: Instant? = null
 )
 
-@Serializable
-data class TenantScoped(val tenantId: String)

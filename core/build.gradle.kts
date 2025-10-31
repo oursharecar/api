@@ -12,9 +12,6 @@ kotlin {
             api(libs.opentelemetry.semconv)
             api(libs.opentelemetry.exporter.otlp)
             api(libs.opentelemetry.ktor)
-            api(project(":domain"))
-            api(libs.mongodb.driver.kotlin.coroutine)
-            api(libs.mongodb.bson.kotlinx)
         }
         jvmTest.dependencies {
             implementation(libs.kotest.assertions.core)
