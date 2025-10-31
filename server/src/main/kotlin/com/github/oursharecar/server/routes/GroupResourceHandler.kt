@@ -3,7 +3,7 @@ package com.github.oursharecar.server.routes
 import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.ktorSerializable
+import com.github.oursharecar.server.models.asResource
 import com.github.oursharecar.server.models.newDomainObjectFromRequest
 import com.github.oursharecar.server.resources.Groups
 import com.github.slugify.Slugify
@@ -25,7 +25,7 @@ private val slugify = Slugify.builder().build()
 
 fun Route.groupRoutes(groupRepository: GroupRepository<Group>) {
     get<Groups> {
-        val groups = groupRepository.findAll().map { it.ktorSerializable() }.toList()
+        val groups = groupRepository.findAll().map { it.asResource() }.toList()
         call.respond(groups)
     }
     post<Groups> {
@@ -37,7 +37,7 @@ fun Route.groupRoutes(groupRepository: GroupRepository<Group>) {
     get<Groups.Id> { group ->
         val result = groupRepository.findById(group.id)
         if (result != null) {
-            call.respond(result.ktorSerializable())
+            call.respond(result.asResource())
         } else {
             call.respond(HttpStatusCode.NotFound)
         }

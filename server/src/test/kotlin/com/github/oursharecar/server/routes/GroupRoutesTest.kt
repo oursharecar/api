@@ -1,35 +1,27 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.domain.common.Auditable
-import com.github.oursharecar.domain.common.DomainSerializersModule
-import com.github.oursharecar.domain.common.ID
-import com.github.oursharecar.domain.common.Page
-import com.github.oursharecar.domain.common.PageRequest
+import com.github.oursharecar.domain.common.*
 import com.github.oursharecar.domain.group.Group
 import com.github.oursharecar.domain.group.GroupRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.KtorSerializableGroup
-import com.github.oursharecar.server.models.ktorSerializable
+import com.github.oursharecar.server.models.GroupResource
+import com.github.oursharecar.server.models.asResource
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
 import com.github.oursharecar.server.utils.GlobalSlugify
-import io.ktor.client.request.get
-import io.ktor.client.request.post
-import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
+import io.ktor.client.request.*
+import io.ktor.client.statement.*
 import io.ktor.http.*
-import io.ktor.http.content.TextContent
-import io.ktor.server.testing.testApplication
+import io.ktor.http.content.*
+import io.ktor.server.testing.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
-import kotlinx.serialization.decodeFromString
-import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
 import kotlin.test.assertTrue
-import org.junit.jupiter.api.Test
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -85,9 +77,9 @@ class GroupRoutesTest {
         val response = client.get("/groups")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val decoded = json.decodeFromString<List<KtorSerializableGroup>>(response.bodyAsText())
+        val decoded = json.decodeFromString<List<GroupResource>>(response.bodyAsText())
         assertEquals(
-            listOf(firstGroup.ktorSerializable(), secondGroup.ktorSerializable()),
+            listOf(firstGroup.asResource(), secondGroup.asResource()),
             decoded
         )
     }
@@ -120,8 +112,8 @@ class GroupRoutesTest {
         val response = client.get("/groups/${id.id}")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val decoded = json.decodeFromString<KtorSerializableGroup>(response.bodyAsText())
-        assertEquals(group.ktorSerializable(), decoded)
+        val decoded = json.decodeFromString<GroupResource>(response.bodyAsText())
+        assertEquals(group.asResource(), decoded)
     }
 
     @Test
