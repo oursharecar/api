@@ -1,5 +1,6 @@
 plugins {
     alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.plugin.serialization)
 }
 
 kotlin {
@@ -12,8 +13,8 @@ kotlin {
             api(libs.opentelemetry.exporter.otlp)
             api(libs.opentelemetry.ktor)
             api(project(":domain"))
-            implementation(libs.mongodb.driver.kotlin.coroutine)
-            implementation(libs.mongodb.bson.kotlinx)
+            api(libs.mongodb.driver.kotlin.coroutine)
+            api(libs.mongodb.bson.kotlinx)
         }
         jvmTest.dependencies {
             implementation(libs.kotest.assertions.core)
@@ -24,6 +25,6 @@ kotlin {
     }
 }
 
-tasks.withType<org.gradle.api.tasks.testing.Test>().configureEach {
+tasks.withType<Test>().configureEach {
     useJUnitPlatform()
 }
