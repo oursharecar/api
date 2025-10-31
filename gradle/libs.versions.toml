@@ -6,7 +6,7 @@ prometheus = "1.6.13"
 coroutines = "1.10.2"
 serialization = "1.9.0"
 kotest = "6.0.4"
-mongodb = "5.4.0"
+mongodb = "5.6.1"
 
 [libraries]
 ktor-server-rate-limiting = { module = "io.github.flaxoos:ktor-server-rate-limiting", version = "2.2.1" }
