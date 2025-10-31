@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 import org.bson.types.ObjectId
 
 @Serializable
-data class MongoGroup(
+internal data class MongoGroup(
     override val name: String,
     override val slug: String,
     override val settings: Group.Settings,

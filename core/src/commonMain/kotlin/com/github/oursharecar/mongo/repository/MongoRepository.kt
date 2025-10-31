@@ -7,8 +7,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import org.bson.types.ObjectId
 
-abstract class MongoRepository<E : DomainModel, M : MongoModel<E>>(val entityCreation: (E) -> M) : Repository<E> {
-    abstract val repo: MongoCollectionRepository<M>
+interface MongoRepository<E : DomainModel, M : MongoModel<E>> : Repository<E> {
+    val repo: MongoCollectionRepository<M>
+    val entityCreation: (E) -> M
 
     override suspend fun findById(id: ID<E>): E? {
         return repo.findById(id.toObjectId())?.dropId()

@@ -10,6 +10,6 @@ class MongoRepositoryFactory(private val config: MongoRepositoryConfig) : Reposi
     private val database = client.getDatabase(config.databaseName)
 
     override fun createGroupRepository(): MongoGroupRepository {
-        return MongoGroupRepository(database.getCollection<com.github.oursharecar.mongo.group.MongoGroup>(config.groupCollectionName))
+        return MongoGroupRepository(database, config.groupCollectionName)
     }
 }
