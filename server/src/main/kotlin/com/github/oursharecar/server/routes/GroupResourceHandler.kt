@@ -1,10 +1,11 @@
 package com.github.oursharecar.server.routes
 
+import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.buildResource
-import com.github.oursharecar.server.repository.Repository
 import com.github.oursharecar.server.resources.Groups
+import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.http.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.delete
@@ -22,7 +23,8 @@ fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
     post<Groups> {
         val request = call.receive<GroupCreateRequest>()
         val sub = "sub(placeholder)"
-        val id = groupRepository.insert(request.buildResource(sub))
+        val slug = GlobalSlugify.slugify(request.name)
+        val id = groupRepository.insert(request.buildResource(sub, slug))
         call.respond(id.id)
     }
 

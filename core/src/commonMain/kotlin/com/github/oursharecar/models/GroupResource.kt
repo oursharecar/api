@@ -1,4 +1,4 @@
-package com.github.oursharecar.server.models
+package com.github.oursharecar.models
 
 import kotlinx.serialization.Serializable
 
@@ -20,4 +20,3 @@ data class GroupResource(
     enum class Visibility { PUBLIC, PRIVATE }
     enum class JoinMode { INVITE, REQUEST, OPEN }
 }
-

@@ -1,4 +1,4 @@
-package com.github.oursharecar.server.models
+package com.github.oursharecar.models
 
 import kotlinx.serialization.Serializable
 

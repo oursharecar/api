@@ -1,7 +1,7 @@
-package com.github.oursharecar.server.repository.mongodb
+package com.github.oursharecar.repository.mongodb
 
-import com.github.oursharecar.server.models.ID
-import com.github.oursharecar.server.repository.Repository
+import com.github.oursharecar.models.ID
+import com.github.oursharecar.repository.Repository
 import com.mongodb.client.model.Filters
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import kotlinx.coroutines.flow.Flow

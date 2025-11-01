@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.resources
 
-import com.github.oursharecar.server.models.GroupResource
-import com.github.oursharecar.server.models.ID
+import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.ID
 import io.ktor.resources.*
 import kotlinx.serialization.Serializable
 

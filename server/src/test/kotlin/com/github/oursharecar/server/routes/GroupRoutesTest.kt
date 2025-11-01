@@ -1,12 +1,12 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.server.models.Auditable
+import com.github.oursharecar.models.Auditable
+import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.ID
+import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.GroupResource
-import com.github.oursharecar.server.models.ID
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
-import com.github.oursharecar.server.repository.Repository
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.client.request.*
 import io.ktor.client.statement.*

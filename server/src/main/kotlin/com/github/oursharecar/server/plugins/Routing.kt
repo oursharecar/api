@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.plugins
 
-import com.github.oursharecar.server.models.GroupResource
-import com.github.oursharecar.server.repository.Repository
+import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.routes.groupRoutes
 import com.github.oursharecar.server.routes.healthRoutes
 import io.ktor.server.application.*

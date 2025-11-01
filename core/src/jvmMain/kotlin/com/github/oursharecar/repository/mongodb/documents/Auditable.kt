@@ -1,4 +1,4 @@
-package com.github.oursharecar.server.repository.mongodb.documents
+package com.github.oursharecar.repository.mongodb.documents
 
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant

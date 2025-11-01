@@ -1,11 +1,11 @@
-package com.github.oursharecar.server.repository.mongodb
+package com.github.oursharecar.repository.mongodb
 
-import com.github.oursharecar.server.models.GroupResource
-import com.github.oursharecar.server.models.ID
-import com.github.oursharecar.server.repository.Repository
-import com.github.oursharecar.server.repository.WrappedRepository
-import com.github.oursharecar.server.repository.mongodb.documents.Auditable
-import com.github.oursharecar.server.repository.mongodb.documents.GroupMongoDocument
+import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.ID
+import com.github.oursharecar.repository.Repository
+import com.github.oursharecar.repository.WrappedRepository
+import com.github.oursharecar.repository.mongodb.documents.Auditable
+import com.github.oursharecar.repository.mongodb.documents.GroupMongoDocument
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import org.bson.types.ObjectId
 import kotlin.time.ExperimentalTime
@@ -23,7 +23,7 @@ class GroupRepository(override val impl: Repository<GroupMongoDocument>) :
             name = this.name,
             slug = this.slug,
             settings = this.settings,
-            audit = com.github.oursharecar.server.models.Auditable(
+            audit = com.github.oursharecar.models.Auditable(
                 createdAt = this.audit.created_at,
                 createdBy = this.audit.created_by,
                 updatedAt = this.audit.updated_at,

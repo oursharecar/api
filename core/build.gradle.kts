@@ -12,6 +12,13 @@ kotlin {
             api(libs.opentelemetry.semconv)
             api(libs.opentelemetry.exporter.otlp)
             api(libs.opentelemetry.ktor)
+            api(libs.kotlinx.serialization.core)
+            api(libs.kotlinx.datetime)
+            api(libs.kotlinx.coroutines.core)
+        }
+        jvmMain.dependencies {
+            implementation(libs.mongodb.driver.kotlin.coroutine)
+            implementation(libs.mongodb.bson.kotlinx)
         }
         jvmTest.dependencies {
             implementation(libs.kotest.assertions.core)

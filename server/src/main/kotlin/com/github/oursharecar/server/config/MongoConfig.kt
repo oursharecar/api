@@ -1,5 +1,6 @@
 package com.github.oursharecar.server.config
 
+import com.github.oursharecar.repository.mongodb.MongoRepositoryConfig
 import com.mongodb.MongoClientSettings
 import io.ktor.server.config.*
 import org.bson.BsonReader
@@ -11,23 +12,17 @@ import org.bson.codecs.configuration.CodecRegistries
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
-interface MongoRepositoryConfig {
-    val connectionString: String?
-    val databaseName: String
-    val groupCollectionName: String
-}
-
 class MongoConfig(config: ApplicationConfig) : MongoRepositoryConfig {
     private val path = config.config("mongodb")
 
-    override val connectionString: String? =
+    private val connectionString: String? =
         path.propertyOrNull("connectionString")?.getString()
     override val databaseName: String =
         path.propertyOrNull("database")?.getString() ?: "oursharecar"
     override val groupCollectionName: String =
         path.propertyOrNull("collections.group")?.getString() ?: "groups"
 
-    val clientSettings: MongoClientSettings = MongoClientSettings.builder().apply {
+    override val clientSettings: MongoClientSettings = MongoClientSettings.builder().apply {
         connectionString?.let {
             applyConnectionString(com.mongodb.ConnectionString(it))
             codecRegistry(

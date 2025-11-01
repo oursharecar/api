@@ -1,6 +1,6 @@
-package com.github.oursharecar.server.repository
+package com.github.oursharecar.repository
 
-import com.github.oursharecar.server.models.ID
+import com.github.oursharecar.models.ID
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 

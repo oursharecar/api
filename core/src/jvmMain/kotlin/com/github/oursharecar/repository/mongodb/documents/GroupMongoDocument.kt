@@ -1,6 +1,6 @@
-package com.github.oursharecar.server.repository.mongodb.documents
+package com.github.oursharecar.repository.mongodb.documents
 
-import com.github.oursharecar.server.models.GroupResource
+import com.github.oursharecar.models.GroupResource
 import org.bson.types.ObjectId
 
 data class GroupMongoDocument(
