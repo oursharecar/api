@@ -13,7 +13,7 @@ class GroupMongoRepository(override val impl: MongoRepositoryService<GroupMongoD
 
     override fun GroupMongoDocument.toResource(): GroupResource {
         return GroupResource(
-            id = this._id?.let { ID<GroupResource>(it.toHexString()) },
+            id = this._id?.let { ID(it.toHexString()) },
             name = this.name,
             slug = this.slug,
             settings = this.settings,
