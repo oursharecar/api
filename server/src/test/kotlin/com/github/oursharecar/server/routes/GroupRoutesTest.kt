@@ -6,7 +6,7 @@ import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.ID
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
-import com.github.oursharecar.server.repository.RepositoryService
+import com.github.oursharecar.server.repository.Repository
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -176,7 +176,7 @@ class GroupRoutesTest {
     )
 }
 
-private class FakeGroupRepository : RepositoryService<GroupResource> {
+private class FakeGroupRepository : Repository<GroupResource> {
     private val storage = linkedMapOf<ID<GroupResource>, GroupResource>()
     private val slugIndex = mutableMapOf<String, ID<GroupResource>>()
     private var nextId = 1

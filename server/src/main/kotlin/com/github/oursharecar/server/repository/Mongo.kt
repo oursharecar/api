@@ -9,19 +9,9 @@ import kotlinx.coroutines.flow.map
 import org.bson.conversions.Bson
 import org.bson.types.ObjectId
 
-interface RepositoryService<T : Any> {
-    suspend fun findById(id: ID<T>): T?
-    suspend fun existsById(id: ID<T>): Boolean = findById(id) != null
-    suspend fun findBySlug(slug: String): T?
-    suspend fun existsBySlug(slug: String): Boolean = findBySlug(slug) != null
-    suspend fun insert(entity: T): ID<T>
-    suspend fun deleteById(id: ID<T>): Boolean
-    fun findAll(): Flow<T>
-}
-
-class MongoRepositoryService<T : Any>(
+class MongoRepository<T : Any>(
     private val collection: MongoCollection<T>,
-) : RepositoryService<T> {
+) : Repository<T> {
     private suspend fun findFirst(filter: Bson): T? {
         val document: T? = collection.find(filter).limit(1).firstOrNull()
         return document
@@ -53,8 +43,8 @@ class MongoRepositoryService<T : Any>(
     override fun findAll(): Flow<T> = collection.find()
 }
 
-interface MongoRepository<R : Any, T : Any> : RepositoryService<R> {
-    val impl: MongoRepositoryService<T>
+interface WrappedRepository<R : Any, T : Any> : Repository<R> {
+    val impl: Repository<T>
 
     fun T.toResource(): R
 

@@ -5,10 +5,10 @@ import com.github.oursharecar.server.models.ID
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import org.bson.types.ObjectId
 
-class GroupMongoRepository(override val impl: MongoRepositoryService<GroupMongoDocument>) :
-    MongoRepository<GroupResource, GroupMongoDocument> {
+class GroupMongoRepository(override val impl: Repository<GroupMongoDocument>) :
+    WrappedRepository<GroupResource, GroupMongoDocument> {
     constructor(collection: MongoCollection<GroupMongoDocument>) : this(
-        MongoRepositoryService(collection)
+        MongoRepository(collection)
     )
 
     override fun GroupMongoDocument.toResource(): GroupResource {
