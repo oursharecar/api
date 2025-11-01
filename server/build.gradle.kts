@@ -32,6 +32,7 @@ dependencies {
     implementation(libs.slugify)
     implementation(libs.mongodb.driver.kotlin.coroutine)
     implementation(libs.mongodb.bson.kotlinx)
+    implementation(libs.kotlinx.datetime)
     testImplementation(libs.ktor.server.test.host)
     testImplementation(libs.kotest.assertions.core)
     testImplementation(libs.kotest.runner.junit5)
