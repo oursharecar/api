@@ -1,8 +1,9 @@
 package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.server.models.GroupCreateRequest
+import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.buildResource
-import com.github.oursharecar.server.repository.GroupRepository
+import com.github.oursharecar.server.repository.RepositoryService
 import com.github.oursharecar.server.resources.Groups
 import com.github.slugify.Slugify
 import io.ktor.http.*
@@ -20,7 +21,7 @@ import kotlinx.coroutines.flow.toList
 
 private val slugify = Slugify.builder().build()
 
-fun Route.groupRoutes(groupRepository: GroupRepository) {
+fun Route.groupRoutes(groupRepository: RepositoryService<GroupResource>) {
     get<Groups> {
         val groups = groupRepository.findAll().toList()
         call.respond(groups)

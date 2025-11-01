@@ -3,42 +3,39 @@ package com.github.oursharecar.server.repository
 import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.ID
 import com.mongodb.kotlin.client.coroutine.MongoCollection
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
+import org.bson.types.ObjectId
 
-class GroupMongoRepository(val collection: MongoCollection<GroupMongoDocument>) : GroupRepository {
-    override suspend fun findById(id: ID<GroupResource>): GroupResource? {
-        return collection.findById(id)?.toGroupResource()
+class GroupMongoRepository(override val impl: MongoRepositoryService<GroupMongoDocument>) :
+    MongoRepository<GroupResource, GroupMongoDocument> {
+    constructor(collection: MongoCollection<GroupMongoDocument>) : this(
+        MongoRepositoryService(collection)
+    )
+
+    override fun GroupMongoDocument.toResource(): GroupResource {
+        return GroupResource(
+            id = this._id?.let { ID<GroupResource>(it.toHexString()) },
+            name = this.name,
+            slug = this.slug,
+            settings = this.settings,
+            audit = this.audit
+        )
     }
 
-    override suspend fun existsById(id: ID<GroupResource>): Boolean {
-        return this.findById(id) != null
+    override fun GroupResource.toDocument(): GroupMongoDocument {
+        return GroupMongoDocument(
+            _id = this.id?.let { ObjectId(it.id) },
+            name = this.name,
+            slug = this.slug,
+            settings = this.settings,
+            audit = this.audit
+        )
     }
 
-    override suspend fun findBySlug(slug: String): GroupResource? {
-        TODO("Not yet implemented")
+    override fun ID<GroupMongoDocument>.toResourceId(): ID<GroupResource> {
+        return ID(this.id)
     }
 
-    override suspend fun existsBySlug(slug: String): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun insert(entity: GroupResource): ID<GroupResource> {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun upsert(
-        id: ID<GroupResource>,
-        entity: GroupResource
-    ): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun deleteById(id: ID<GroupResource>): Boolean {
-        TODO("Not yet implemented")
-    }
-
-    override fun findAll(): Flow<GroupResource> {
-        return collection.find().map { it.toGroupResource() }
+    override fun ID<GroupResource>.toDocumentId(): ID<GroupMongoDocument> {
+        return ID(this.id)
     }
 }

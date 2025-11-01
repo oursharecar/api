@@ -6,7 +6,7 @@ import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.ID
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
-import com.github.oursharecar.server.repository.GroupRepository
+import com.github.oursharecar.server.repository.RepositoryService
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -176,7 +176,7 @@ class GroupRoutesTest {
     )
 }
 
-private class FakeGroupRepository : GroupRepository {
+private class FakeGroupRepository : RepositoryService<GroupResource> {
     private val storage = linkedMapOf<ID<GroupResource>, GroupResource>()
     private val slugIndex = mutableMapOf<String, ID<GroupResource>>()
     private var nextId = 1
@@ -212,13 +212,6 @@ private class FakeGroupRepository : GroupRepository {
         storage[id] = resource
         slugIndex[resource.slug] = id
         return id
-    }
-
-    override suspend fun upsert(id: ID<GroupResource>, entity: GroupResource): Boolean {
-        val resource = entity.copy(id = id)
-        storage[id] = resource
-        slugIndex[resource.slug] = id
-        return true
     }
 
     override suspend fun deleteById(id: ID<GroupResource>): Boolean = storage.remove(id) != null
