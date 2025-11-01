@@ -3,8 +3,8 @@ package com.github.oursharecar.models
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class GroupResource(
-    val id: ID<GroupResource>?,
+data class Group(
+    val id: ID<Group>?,
     val name: String,
     val slug: String,
     val settings: Settings,

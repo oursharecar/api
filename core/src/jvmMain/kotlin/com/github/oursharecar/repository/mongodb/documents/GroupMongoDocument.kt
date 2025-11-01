@@ -1,12 +1,12 @@
 package com.github.oursharecar.repository.mongodb.documents
 
-import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.Group
 import org.bson.types.ObjectId
 
 data class GroupMongoDocument(
     val _id: ObjectId?,
     val name: String,
     val slug: String,
-    val settings: GroupResource.Settings,
+    val settings: Group.Settings,
     val audit: Auditable
 )

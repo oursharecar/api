@@ -1,6 +1,6 @@
 package com.github.oursharecar.repository.mongodb
 
-import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.Group
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.repository.WrappedRepository
@@ -11,14 +11,14 @@ import org.bson.types.ObjectId
 import kotlin.time.ExperimentalTime
 
 class GroupRepository(override val impl: Repository<GroupMongoDocument>) :
-    WrappedRepository<GroupResource, GroupMongoDocument> {
+    WrappedRepository<Group, GroupMongoDocument> {
     constructor(collection: MongoCollection<GroupMongoDocument>) : this(
         MongoRepository(collection)
     )
 
     @OptIn(ExperimentalTime::class)
-    override fun GroupMongoDocument.toResource(): GroupResource {
-        return GroupResource(
+    override fun GroupMongoDocument.toResource(): Group {
+        return Group(
             id = this._id?.let { ID(it.toHexString()) },
             name = this.name,
             slug = this.slug,
@@ -34,7 +34,7 @@ class GroupRepository(override val impl: Repository<GroupMongoDocument>) :
     }
 
     @OptIn(ExperimentalTime::class)
-    override fun GroupResource.toDocument(): GroupMongoDocument {
+    override fun Group.toDocument(): GroupMongoDocument {
         return GroupMongoDocument(
             _id = this.id?.let { ObjectId(it.id) },
             name = this.name,
@@ -50,11 +50,11 @@ class GroupRepository(override val impl: Repository<GroupMongoDocument>) :
         )
     }
 
-    override fun ID<GroupMongoDocument>.toResourceId(): ID<GroupResource> {
+    override fun ID<GroupMongoDocument>.toResourceId(): ID<Group> {
         return ID(this.id)
     }
 
-    override fun ID<GroupResource>.toDocumentId(): ID<GroupMongoDocument> {
+    override fun ID<Group>.toDocumentId(): ID<GroupMongoDocument> {
         return ID(this.id)
     }
 }
