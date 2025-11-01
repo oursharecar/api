@@ -5,21 +5,14 @@ import com.github.oursharecar.server.models.GroupResource
 import com.github.oursharecar.server.models.buildResource
 import com.github.oursharecar.server.repository.Repository
 import com.github.oursharecar.server.resources.Groups
-import com.github.slugify.Slugify
 import io.ktor.http.*
-import io.ktor.server.application.ApplicationCall
-import io.ktor.server.auth.*
-import io.ktor.server.auth.jwt.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.ktor.server.util.*
 import kotlinx.coroutines.flow.toList
-
-private val slugify = Slugify.builder().build()
 
 fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
     get<Groups> {
@@ -75,19 +68,4 @@ fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
         // TODO: Implement removing a group member by ID with authentication
         call.respond(HttpStatusCode.NotImplemented)
     }
-}
-
-fun ApplicationCall.isMemberOfGroup(groupId: String?): Boolean =
-    principal<JWTPrincipal>()?.payload?.getClaim("groups")?.asList(String::class.java)?.contains(groupId) == true
-
-suspend fun RoutingContext.checkGroupClaimMatchesParameter(
-    key: String,
-    block: suspend RoutingContext.(String) -> Unit
-) {
-    val groupId = call.parameters.getOrFail(key)
-    if (!call.isMemberOfGroup(groupId)) {
-        call.respond(HttpStatusCode.Unauthorized)
-        return
-    }
-    block(groupId)
 }
