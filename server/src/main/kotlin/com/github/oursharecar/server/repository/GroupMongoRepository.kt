@@ -5,7 +5,12 @@ import com.github.oursharecar.server.models.ID
 import com.mongodb.kotlin.client.coroutine.MongoCollection
 import kotlinx.coroutines.flow.Flow
 
-class GroupMongoRepository(collection: MongoCollection<GroupMongoDocument>) : GroupRepository {
+object IdConverter {
+    fun convert(id: ID<*>): ObjectId = ObjectId(id.id)
+    fun <T> convert(id: ObjectId): ID<T> = ID(id.toHexString())
+}
+
+class GroupMongoRepository(val collection: MongoCollection<GroupMongoDocument>) : GroupRepository {
     override suspend fun findById(id: ID<GroupResource>): GroupResource? {
         TODO("Not yet implemented")
     }
