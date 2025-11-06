@@ -21,7 +21,4 @@ data class AuditableResource(
     val updatedAt: Instant,
     @SerialName("updated_by")
     val updatedBy: String,
-    @Serializable(with = Rfc1123Serializer::class)
-    @SerialName("deleted_at")
-    val deletedAt: Instant? = null
 )
