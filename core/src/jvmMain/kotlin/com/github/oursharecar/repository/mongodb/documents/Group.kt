@@ -3,7 +3,7 @@ package com.github.oursharecar.repository.mongodb.documents
 import com.github.oursharecar.models.Group
 import org.bson.types.ObjectId
 
-data class GroupMongoDocument(
+data class Group(
     val _id: ObjectId?,
     val name: String,
     val slug: String,
