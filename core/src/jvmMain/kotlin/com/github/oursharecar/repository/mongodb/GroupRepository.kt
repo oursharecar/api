@@ -1,5 +1,6 @@
 package com.github.oursharecar.repository.mongodb
 
+import com.github.oursharecar.models.AuditableResource
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.repository.Repository
@@ -23,12 +24,12 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
             name = this.name,
             slug = this.slug,
             settings = this.settings,
-            audit = com.github.oursharecar.models.AuditableResource(
-                createdAt = this.audit.created_at,
-                createdBy = this.audit.created_by,
-                updatedAt = this.audit.updated_at,
-                updatedBy = this.audit.updated_by,
-                deletedAt = this.audit.deleted_at
+            audit = AuditableResource(
+                createdAt = this.audit.createdAt,
+                createdBy = this.audit.createdBy,
+                updatedAt = this.audit.updatedAt,
+                updatedBy = this.audit.updatedBy,
+                deletedAt = this.audit.deletedAt
             )
         )
     }
@@ -41,11 +42,11 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
             slug = this.slug,
             settings = this.settings,
             audit = Auditable(
-                created_at = this.audit.createdAt,
-                created_by = this.audit.createdBy,
-                updated_at = this.audit.updatedAt,
-                updated_by = this.audit.updatedBy,
-                deleted_at = this.audit.deletedAt
+                createdAt = this.audit.createdAt,
+                createdBy = this.audit.createdBy,
+                updatedAt = this.audit.updatedAt,
+                updatedBy = this.audit.updatedBy,
+                deletedAt = this.audit.deletedAt
             )
         )
     }
