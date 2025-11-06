@@ -28,8 +28,7 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
                 createdAt = this.audit.createdAt,
                 createdBy = this.audit.createdBy,
                 updatedAt = this.audit.updatedAt,
-                updatedBy = this.audit.updatedBy,
-                deletedAt = this.audit.deletedAt
+                updatedBy = this.audit.updatedBy
             )
         )
     }
@@ -45,8 +44,7 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
                 createdAt = this.audit.createdAt,
                 createdBy = this.audit.createdBy,
                 updatedAt = this.audit.updatedAt,
-                updatedBy = this.audit.updatedBy,
-                deletedAt = this.audit.deletedAt
+                updatedBy = this.audit.updatedBy
             )
         )
     }
