@@ -5,7 +5,7 @@ import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
-data class Auditable(
+data class AuditableDocument(
     @BsonProperty("created_at")
     val createdAt: Instant,
     @BsonProperty("created_by")

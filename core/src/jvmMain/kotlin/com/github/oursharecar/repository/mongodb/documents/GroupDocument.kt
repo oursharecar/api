@@ -5,12 +5,12 @@ import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 import org.bson.types.ObjectId
 
-data class Group(
+data class GroupDocument(
     @BsonId
     @BsonProperty("_id")
     val id: ObjectId?,
     val name: String,
     val slug: String,
     val settings: GroupResource.Settings,
-    val audit: Auditable
+    val audit: AuditableDocument
 )
