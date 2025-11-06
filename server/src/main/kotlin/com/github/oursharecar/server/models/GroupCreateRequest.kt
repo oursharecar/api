@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.models
 
-import com.github.oursharecar.models.Auditable
-import com.github.oursharecar.models.Group
+import com.github.oursharecar.models.AuditableResource
+import com.github.oursharecar.models.GroupResource
 import kotlinx.serialization.Serializable
 import kotlin.time.Clock
 import kotlin.time.ExperimentalTime
@@ -16,17 +16,17 @@ data class GroupCreateRequest(
 fun GroupCreateRequest.buildResource(
     createdBy: String,
     slug: String,
-): Group =
-    Group(
+): GroupResource =
+    GroupResource(
         id = null,
         name = name,
         slug = slug,
-        settings = Group.Settings(
-            visibility = Group.Visibility.PRIVATE,
-            joinMode = Group.JoinMode.INVITE,
+        settings = GroupResource.Settings(
+            visibility = GroupResource.Visibility.PRIVATE,
+            joinMode = GroupResource.JoinMode.INVITE,
             memberLimit = 10
         ),
-        audit = Auditable(
+        audit = AuditableResource(
             createdAt = Clock.System.now(),
             updatedAt = Clock.System.now(),
             createdBy = createdBy,

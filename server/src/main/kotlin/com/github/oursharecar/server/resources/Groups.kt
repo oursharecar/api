@@ -1,6 +1,6 @@
 package com.github.oursharecar.server.resources
 
-import com.github.oursharecar.models.Group
+import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import io.ktor.resources.*
 import kotlinx.serialization.Serializable
@@ -9,7 +9,7 @@ import kotlinx.serialization.Serializable
 @Resource("/groups")
 class Groups {
     @Resource("{id}")
-    data class Id(val parent: Groups = Groups(), val id: ID<Group>) {
+    data class Id(val parent: Groups = Groups(), val id: ID<GroupResource>) {
         @Resource("members")
         data class Members(val group: Id) {
             @Resource("{memberId}")

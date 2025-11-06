@@ -1,7 +1,7 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.models.Auditable
-import com.github.oursharecar.models.Group
+import com.github.oursharecar.models.AuditableResource
+import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.models.GroupCreateRequest
@@ -34,13 +34,13 @@ class GroupRoutesTest {
     @Test
     fun `GET groups returns all available groups`() = testApplication {
         val repository = FakeGroupRepository()
-        val firstGroup = Group(
+        val firstGroup = GroupResource(
             id = null,
             name = "Downtown Drivers",
             slug = "downtown-drivers",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PUBLIC,
-                joinMode = Group.JoinMode.OPEN,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PUBLIC,
+                joinMode = GroupResource.JoinMode.OPEN,
                 memberLimit = 50
             ),
             audit = audit(
@@ -50,13 +50,13 @@ class GroupRoutesTest {
                 updatedAtMillis = 2_000L
             )
         )
-        val secondGroup = Group(
+        val secondGroup = GroupResource(
             id = null,
             name = "Weekend Riders",
             slug = "weekend-riders",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PRIVATE,
-                joinMode = Group.JoinMode.INVITE,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PRIVATE,
+                joinMode = GroupResource.JoinMode.INVITE,
                 memberLimit = 10
             ),
             audit = audit(
@@ -77,7 +77,7 @@ class GroupRoutesTest {
         val response = client.get("/groups")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val decoded = json.decodeFromString<List<Group>>(response.bodyAsText())
+        val decoded = json.decodeFromString<List<GroupResource>>(response.bodyAsText())
         assertEquals(
             listOf(
                 firstGroup.copy(id = ID("group-1")),
@@ -90,13 +90,13 @@ class GroupRoutesTest {
     @Test
     fun `GET groups id returns existing group`() = testApplication {
         val repository = FakeGroupRepository()
-        val group = Group(
+        val group = GroupResource(
             id = null,
             name = "Neighborhood Carpool",
             slug = "neighborhood-carpool",
-            settings = Group.Settings(
-                visibility = Group.Visibility.PUBLIC,
-                joinMode = Group.JoinMode.REQUEST,
+            settings = GroupResource.Settings(
+                visibility = GroupResource.Visibility.PUBLIC,
+                joinMode = GroupResource.JoinMode.REQUEST,
                 memberLimit = 25
             ),
             audit = audit(
@@ -116,7 +116,7 @@ class GroupRoutesTest {
         val response = client.get("/groups/${id.id}")
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val decoded = json.decodeFromString<Group>(response.bodyAsText())
+        val decoded = json.decodeFromString<GroupResource>(response.bodyAsText())
         assertEquals(group.copy(id = ID("group-42")), decoded)
     }
 
@@ -157,7 +157,7 @@ class GroupRoutesTest {
         val createdId = response.bodyAsText()
         assertTrue(createdId.startsWith("group-"))
 
-        val stored = runBlocking { repository.findById(ID<Group>(createdId)) }
+        val stored = runBlocking { repository.findById(ID<GroupResource>(createdId)) }
         assertNotNull(stored)
         assertEquals("Late Night Cruisers", stored.name)
         assertEquals(GlobalSlugify.slugify("Late Night Cruisers"), stored.slug)
@@ -168,7 +168,7 @@ class GroupRoutesTest {
         updatedBy: String,
         createdAtMillis: Long,
         updatedAtMillis: Long
-    ) = Auditable(
+    ) = AuditableResource(
         createdAt = Instant.fromEpochMilliseconds(createdAtMillis),
         createdBy = createdBy,
         updatedAt = Instant.fromEpochMilliseconds(updatedAtMillis),
@@ -176,13 +176,13 @@ class GroupRoutesTest {
     )
 }
 
-private class FakeGroupRepository : Repository<Group> {
-    private val storage = linkedMapOf<ID<Group>, Group>()
-    private val slugIndex = mutableMapOf<String, ID<Group>>()
+private class FakeGroupRepository : Repository<GroupResource> {
+    private val storage = linkedMapOf<ID<GroupResource>, GroupResource>()
+    private val slugIndex = mutableMapOf<String, ID<GroupResource>>()
     private var nextId = 1
 
-    fun seed(idValue: String, group: Group): ID<Group> {
-        val id = ID<Group>(idValue)
+    fun seed(idValue: String, group: GroupResource): ID<GroupResource> {
+        val id = ID<GroupResource>(idValue)
         val resource = group.copy(id = id)
         storage[id] = resource
         slugIndex[resource.slug] = id
@@ -190,10 +190,10 @@ private class FakeGroupRepository : Repository<Group> {
         return id
     }
 
-    override suspend fun findById(id: ID<Group>): Group? = storage[id]
+    override suspend fun findById(id: ID<GroupResource>): GroupResource? = storage[id]
 
-    override suspend fun existsById(id: ID<Group>): Boolean = storage.containsKey(id)
-    override suspend fun findBySlug(slug: String): Group? {
+    override suspend fun existsById(id: ID<GroupResource>): Boolean = storage.containsKey(id)
+    override suspend fun findBySlug(slug: String): GroupResource? {
         TODO("Not yet implemented")
     }
 
@@ -201,8 +201,8 @@ private class FakeGroupRepository : Repository<Group> {
         TODO("Not yet implemented")
     }
 
-    override suspend fun insert(entity: Group): ID<Group> {
-        var id: ID<Group>
+    override suspend fun insert(entity: GroupResource): ID<GroupResource> {
+        var id: ID<GroupResource>
         do {
             val idValue = "group-${nextId++}"
             id = ID(idValue)
@@ -214,9 +214,9 @@ private class FakeGroupRepository : Repository<Group> {
         return id
     }
 
-    override suspend fun deleteById(id: ID<Group>): Boolean = storage.remove(id) != null
+    override suspend fun deleteById(id: ID<GroupResource>): Boolean = storage.remove(id) != null
 
-    override fun findAll(): Flow<Group> = flow {
+    override fun findAll(): Flow<GroupResource> = flow {
         storage.values.forEach { emit(it) }
     }
 

@@ -10,7 +10,7 @@ import kotlin.time.Instant
  */
 @OptIn(ExperimentalTime::class)
 @Serializable
-data class Auditable(
+data class AuditableResource(
     @Serializable(with = Rfc1123Serializer::class)
     @SerialName("created_at")
     val createdAt: Instant,

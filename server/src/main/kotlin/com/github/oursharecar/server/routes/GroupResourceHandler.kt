@@ -1,6 +1,6 @@
 package com.github.oursharecar.server.routes
 
-import com.github.oursharecar.models.Group
+import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.buildResource
@@ -15,7 +15,7 @@ import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.flow.toList
 
-fun Route.groupRoutes(groupRepository: Repository<Group>) {
+fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
     get<Groups> {
         val groups = groupRepository.findAll().toList()
         call.respond(groups)

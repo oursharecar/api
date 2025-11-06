@@ -1,6 +1,6 @@
 package com.github.oursharecar.repository.mongodb.documents
 
-import com.github.oursharecar.models.Group
+import com.github.oursharecar.models.GroupResource
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 import org.bson.types.ObjectId
@@ -11,6 +11,6 @@ data class Group(
     val id: ObjectId?,
     val name: String,
     val slug: String,
-    val settings: Group.Settings,
+    val settings: GroupResource.Settings,
     val audit: Auditable
 )
