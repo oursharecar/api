@@ -26,6 +26,9 @@ kotlin {
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.mongo.java.server)
         }
+        all {
+            languageSettings.enableLanguageFeature("PropertyParamAnnotationDefaultTargetMode")
+        }
     }
 }
 

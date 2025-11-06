@@ -19,7 +19,7 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
     @OptIn(ExperimentalTime::class)
     override fun GroupDocument.toResource(): GroupResource {
         return GroupResource(
-            id = this._id?.let { ID(it.toHexString()) },
+            id = this.id?.let { ID(it.toHexString()) },
             name = this.name,
             slug = this.slug,
             settings = this.settings,
@@ -36,7 +36,7 @@ class GroupRepository(override val impl: Repository<GroupDocument>) :
     @OptIn(ExperimentalTime::class)
     override fun GroupResource.toDocument(): GroupDocument {
         return GroupDocument(
-            _id = this.id?.let { ObjectId(it.id) },
+            id = this.id?.let { ObjectId(it.id) },
             name = this.name,
             slug = this.slug,
             settings = this.settings,

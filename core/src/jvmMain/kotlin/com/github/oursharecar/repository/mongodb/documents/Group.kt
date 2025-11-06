@@ -1,10 +1,14 @@
 package com.github.oursharecar.repository.mongodb.documents
 
 import com.github.oursharecar.models.Group
+import org.bson.codecs.pojo.annotations.BsonId
+import org.bson.codecs.pojo.annotations.BsonProperty
 import org.bson.types.ObjectId
 
 data class Group(
-    val _id: ObjectId?,
+    @BsonId
+    @BsonProperty("_id")
+    val id: ObjectId?,
     val name: String,
     val slug: String,
     val settings: Group.Settings,
