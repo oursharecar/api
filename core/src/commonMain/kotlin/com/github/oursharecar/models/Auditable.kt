@@ -1,16 +1,9 @@
 package com.github.oursharecar.models
 
-import kotlinx.datetime.format.DateTimeComponents
-import kotlinx.datetime.serializers.FormattedInstantSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
-
-object Rfc1123Serializer : FormattedInstantSerializer(
-    "com.github.oursharecar.server.models.Rfc1123Serializer",
-    DateTimeComponents.Formats.RFC_1123
-)
 
 /**
  * Represents audit metadata tracked for persisted entities.
