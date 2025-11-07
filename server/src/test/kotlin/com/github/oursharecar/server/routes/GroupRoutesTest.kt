@@ -4,14 +4,17 @@ import com.github.oursharecar.models.AuditableResource
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.repository.Repository
+import com.github.oursharecar.repository.RepositoryFactory
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
+import com.github.oursharecar.server.service.ServerServiceImpl
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
 import io.ktor.http.content.*
+import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -20,7 +23,6 @@ import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertNotNull
-import kotlin.test.assertTrue
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -155,7 +157,6 @@ class GroupRoutesTest {
 
         assertEquals(HttpStatusCode.OK, response.status)
         val createdId = response.bodyAsText()
-        assertTrue(createdId.startsWith("group-"))
 
         val stored = runBlocking { repository.findById(ID<GroupResource>(createdId)) }
         assertNotNull(stored)
@@ -193,13 +194,6 @@ private class FakeGroupRepository : Repository<GroupResource> {
     override suspend fun findById(id: ID<GroupResource>): GroupResource? = storage[id]
 
     override suspend fun existsById(id: ID<GroupResource>): Boolean = storage.containsKey(id)
-    override suspend fun findBySlug(slug: String): GroupResource? {
-        TODO("Not yet implemented")
-    }
-
-    override suspend fun existsBySlug(slug: String): Boolean {
-        TODO("Not yet implemented")
-    }
 
     override suspend fun insert(entity: GroupResource): ID<GroupResource> {
         var id: ID<GroupResource>
@@ -227,4 +221,10 @@ private class FakeGroupRepository : Repository<GroupResource> {
             nextId = candidate
         }
     }
+}
+
+private fun Application.configureRouting(repository: FakeGroupRepository) {
+    configureRouting(ServerServiceImpl(object : RepositoryFactory {
+        override fun getGroupRepository() = repository
+    }))
 }

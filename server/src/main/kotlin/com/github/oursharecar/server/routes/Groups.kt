@@ -2,10 +2,7 @@ package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
-import com.github.oursharecar.repository.Repository
-import com.github.oursharecar.server.models.GroupCreateRequest
-import com.github.oursharecar.server.models.buildResource
-import com.github.oursharecar.server.utils.GlobalSlugify
+import com.github.oursharecar.server.service.ServerService
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.request.*
@@ -14,7 +11,8 @@ import io.ktor.server.resources.get
 import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.async
+import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -30,44 +28,38 @@ class Groups {
     }
 }
 
-fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
+fun Route.groupRoutes(service: ServerService) {
+    // Operations on a collection of groups
     get<Groups> {
-        val groups = groupRepository.findAll().toList()
-        call.respond(groups)
+        call.respond(service.listGroups())
     }
     post<Groups> {
-        val request = call.receive<GroupCreateRequest>()
-        val sub = "sub(placeholder)"
-        val slug = GlobalSlugify.slugify(request.name)
-        val id = groupRepository.insert(request.buildResource(sub, slug))
-        call.respond(id.id)
+        call.respond(service.createGroup(call.receive()))
     }
 
+    // Operations on a single group identified by ID
     get<Groups.Id> { group ->
-        val result = groupRepository.findById(group.id)
-        if (result != null) {
-            call.respond(result)
+        val result = service.getGroup(group.id)
+        if (result == null) {
+            call.respond(HttpStatusCode.NotFound, "Group not found")
         } else {
-            call.respond(HttpStatusCode.NotFound)
+            call.respond(result)
         }
     }
     patch<Groups.Id> { group ->
         // TODO: Implement updating a group by ID with authentication
         call.respond(HttpStatusCode.NotImplemented)
     }
-    post<Groups.Id> { group ->
-        // TODO: Implement deleting a group by ID with authentication
-        call.respond(HttpStatusCode.NotImplemented)
-    }
-    patch<Groups.Id> { group ->
-        // TODO: Implement adding a member to a group by ID with authentication
-        call.respond(HttpStatusCode.NotImplemented)
-    }
     delete<Groups.Id> { group ->
-        // TODO: Implement removing a member from a group by ID with authentication
-        call.respond(HttpStatusCode.NotImplemented)
+        coroutineScope {
+            async {
+                service.deleteGroup(group.id)
+            }
+        }
+        call.respond(HttpStatusCode.NoContent)
     }
 
+    // Operations on group members
     get<Groups.Id.Members> { groupMembers ->
         // TODO: Implement getting group members by group ID with authentication
         call.respond(HttpStatusCode.NotImplemented)
@@ -77,6 +69,7 @@ fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
         call.respond(HttpStatusCode.NotImplemented)
     }
 
+    // Operations on a single group member identified by ID
     patch<Groups.Id.Members.Id> { groupMember ->
         // TODO: Implement getting a group member by ID with authentication
         call.respond(HttpStatusCode.NotImplemented)

@@ -22,11 +22,6 @@ class MongoRepository<T : Any>(
         return findFirst(filter)
     }
 
-    override suspend fun findBySlug(slug: String): T? {
-        val filter = Filters.eq("slug", slug)
-        return findFirst(filter)
-    }
-
     override suspend fun insert(entity: T): ID<T> {
         val result = collection.insertOne(entity)
         val insertedId =

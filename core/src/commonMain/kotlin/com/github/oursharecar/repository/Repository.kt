@@ -7,8 +7,6 @@ import kotlinx.coroutines.flow.map
 interface Repository<T : Any> {
     suspend fun findById(id: ID<T>): T?
     suspend fun existsById(id: ID<T>): Boolean = findById(id) != null
-    suspend fun findBySlug(slug: String): T?
-    suspend fun existsBySlug(slug: String): Boolean = findBySlug(slug) != null
     suspend fun insert(entity: T): ID<T>
     suspend fun deleteById(id: ID<T>): Boolean
     fun findAll(): Flow<T>
@@ -26,7 +24,6 @@ interface WrappedRepository<R : Any, T : Any> : Repository<R> {
     fun ID<R>.toDocumentId(): ID<T>
 
     override suspend fun findById(id: ID<R>): R? = impl.findById(id.toDocumentId())?.toResource()
-    override suspend fun findBySlug(slug: String): R? = impl.findBySlug(slug)?.toResource()
     override suspend fun insert(entity: R): ID<R> {
         val documentId = impl.insert(entity.toDocument())
         return documentId.toResourceId()

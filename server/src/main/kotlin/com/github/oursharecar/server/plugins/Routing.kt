@@ -1,16 +1,15 @@
 package com.github.oursharecar.server.plugins
 
-import com.github.oursharecar.models.GroupResource
-import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.routes.groupRoutes
 import com.github.oursharecar.server.routes.healthRoutes
+import com.github.oursharecar.server.service.ServerService
 import io.ktor.server.application.*
 import io.ktor.server.plugins.conditionalheaders.*
 import io.ktor.server.plugins.defaultheaders.*
 import io.ktor.server.resources.*
 import io.ktor.server.routing.*
 
-fun Application.configureRouting(groupRepository: Repository<GroupResource>) {
+fun Application.configureRouting(service: ServerService) {
     install(DefaultHeaders) {
         header("X-Service", "oursharecar-api")
     }
@@ -19,6 +18,6 @@ fun Application.configureRouting(groupRepository: Repository<GroupResource>) {
 
     routing {
         healthRoutes()
-        groupRoutes(groupRepository)
+        groupRoutes(service)
     }
 }
