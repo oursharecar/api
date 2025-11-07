@@ -31,19 +31,19 @@ class Groups {
 fun Route.groupRoutes(service: ServerService) {
     // Operations on a collection of groups
     get<Groups> {
-        call.respond(service.listGroups())
+        call.respond<List<GroupResource>>(service.listGroups())
     }
     post<Groups> {
-        call.respond(service.createGroup(call.receive()))
+        call.respond<ID<GroupResource>>(service.createGroup(call.receive()))
     }
 
     // Operations on a single group identified by ID
     get<Groups.Id> { group ->
         val result = service.getGroup(group.id)
-        if (result == null) {
-            call.respond(HttpStatusCode.NotFound, "Group not found")
+        if (result != null) {
+            call.respond<GroupResource>(result)
         } else {
-            call.respond(result)
+            call.respond<String>(HttpStatusCode.NotFound, "Group not found")
         }
     }
     patch<Groups.Id> { group ->
