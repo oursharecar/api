@@ -26,7 +26,7 @@ interface ServerService {
     suspend fun removeGroupMember(request: GroupMemberRemoveRequest): Boolean
 }
 
-class ServerServiceImpl(val factory: RepositoryFactory) : ServerService {
+class ServerServiceImpl(factory: RepositoryFactory) : ServerService {
     private val groups: Repository<GroupResource> = factory.getGroupRepository()
 
     override suspend fun getUser(id: ID<UserResource>): UserResource? {
