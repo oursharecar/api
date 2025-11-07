@@ -1,12 +1,13 @@
 package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.models.GroupResource
+import com.github.oursharecar.models.ID
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.models.buildResource
-import com.github.oursharecar.server.resources.Groups
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.ktor.http.*
+import io.ktor.resources.*
 import io.ktor.server.request.*
 import io.ktor.server.resources.delete
 import io.ktor.server.resources.get
@@ -14,6 +15,20 @@ import io.ktor.server.resources.post
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
 import kotlinx.coroutines.flow.toList
+import kotlinx.serialization.Serializable
+
+@Serializable
+@Resource("/groups")
+class Groups {
+    @Resource("{id}")
+    data class Id(val parent: Groups = Groups(), val id: ID<GroupResource>) {
+        @Resource("members")
+        data class Members(val group: Id) {
+            @Resource("{memberId}")
+            class Id
+        }
+    }
+}
 
 fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
     get<Groups> {
@@ -71,3 +86,4 @@ fun Route.groupRoutes(groupRepository: Repository<GroupResource>) {
         call.respond(HttpStatusCode.NotImplemented)
     }
 }
+
