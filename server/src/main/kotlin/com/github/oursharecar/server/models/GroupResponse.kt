@@ -1,9 +1,0 @@
-package com.github.oursharecar.server.models
-
-import kotlinx.serialization.Serializable
-
-@Serializable
-data class GroupResponse(
-    val id: String,
-    val name: String,
-)
