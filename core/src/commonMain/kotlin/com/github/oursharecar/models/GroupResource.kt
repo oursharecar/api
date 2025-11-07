@@ -4,12 +4,12 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class GroupResource(
-    val id: ID<GroupResource>?,
+    override val id: ID<GroupResource>?,
     val name: String,
     val slug: String,
     val settings: Settings,
     val audit: AuditableResource
-) {
+) : Identifiable<GroupResource> {
     @Serializable
     data class Settings(
         val visibility: Visibility,
@@ -19,4 +19,6 @@ data class GroupResource(
 
     enum class Visibility { PUBLIC, PRIVATE }
     enum class JoinMode { INVITE, REQUEST, OPEN }
+
+    override fun withId(id: ID<GroupResource>): GroupResource = copy(id = id)
 }
