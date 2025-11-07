@@ -1,4 +1,5 @@
-import com.github.oursharecar.repository.mongodb.documents.AuditableDocument
+package com.github.oursharecar.repository.mongodb.documents
+
 import org.bson.codecs.pojo.annotations.BsonId
 import org.bson.codecs.pojo.annotations.BsonProperty
 import org.bson.types.ObjectId
