@@ -6,7 +6,7 @@ import kotlin.time.ExperimentalTime
 @OptIn(ExperimentalTime::class)
 @Serializable
 data class UserResource(
-    val id: ID<UserResource>,
+    override val id: ID<UserResource>? = null,
 
     val name: String,
 
@@ -15,7 +15,7 @@ data class UserResource(
 
     /** ユーザー設定（preferences） */
     val preferences: PreferencesResource = PreferencesResource(),
-) {
+) : Identifiable<UserResource> {
     @Serializable
     data class PreferencesResource(
         val unitSystem: String = "metric",
@@ -23,4 +23,6 @@ data class UserResource(
         val language: String = "ja-JP",
         val theme: String? = null
     )
+
+    override fun withId(id: ID<UserResource>) = this.copy(id = id)
 }

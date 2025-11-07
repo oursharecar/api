@@ -21,6 +21,8 @@ class MongoConfig(config: ApplicationConfig) : MongoRepositoryConfig {
         path.propertyOrNull("database")?.getString() ?: "oursharecar"
     override val groupCollectionName: String =
         path.propertyOrNull("collections.group")?.getString() ?: "groups"
+    override val userCollectionName: String =
+        path.propertyOrNull("collection.user")?.getString() ?: "users"
 
     override val clientSettings: MongoClientSettings = MongoClientSettings.builder().apply {
         connectionString?.let {
