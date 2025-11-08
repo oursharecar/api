@@ -2,9 +2,8 @@ package com.github.oursharecar.server.service
 
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
-import com.github.oursharecar.models.UserResource
+import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.repository.RepositoryFactory
-import com.github.oursharecar.server.LinkedMapRepository
 import com.github.oursharecar.server.fixtures.sampleGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.utils.GlobalSlugify
@@ -15,49 +14,51 @@ import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
+import io.mockk.*
+import kotlinx.coroutines.flow.flowOf
 import kotlin.time.ExperimentalTime
 
 @OptIn(ExperimentalTime::class)
 class ServerServiceImplTest : FunSpec({
-    lateinit var groupRepository: LinkedMapRepository<GroupResource>
-    lateinit var userRepository: LinkedMapRepository<UserResource>
-    lateinit var service: ServerService
-
-    beforeTest {
-        groupRepository = LinkedMapRepository()
-        service = ServerServiceImpl(
-            object : RepositoryFactory {
-                override fun getGroupRepository() = groupRepository
-                override fun getUserRepository() = userRepository
-            }
-        )
-    }
-
     test("getGroup returns persisted group when id exists") {
+        val (service, groupRepository) = buildService()
+        val id = ID<GroupResource>("group-7")
         val expected = sampleGroup(idValue = "group-7", name = "Neighborhood Carpool")
-        groupRepository.seed("group-7", expected)
+        coEvery { groupRepository.findById(id) } returns expected
 
-        service.getGroup(ID<GroupResource>("group-7")) shouldBe expected
+        service.getGroup(id) shouldBe expected
+        coVerify(exactly = 1) { groupRepository.findById(id) }
     }
 
     test("getGroup returns null when group is missing") {
-        service.getGroup(ID<GroupResource>("group-missing")) shouldBe null
+        val (service, groupRepository) = buildService()
+        val id = ID<GroupResource>("group-missing")
+        coEvery { groupRepository.findById(id) } returns null
+
+        service.getGroup(id) shouldBe null
+        coVerify(exactly = 1) { groupRepository.findById(id) }
     }
 
     test("listGroups emits all groups in insertion order") {
+        val (service, groupRepository) = buildService()
         val first = sampleGroup(idValue = "group-1", name = "Downtown Drivers")
         val second = sampleGroup(idValue = "group-2", name = "Weekend Riders")
-        groupRepository.seed("group-1", first)
-        groupRepository.seed("group-2", second)
+        every { groupRepository.findAll() } returns flowOf(first, second)
 
         service.listGroups() shouldContainExactly listOf(first, second)
+        verify(exactly = 1) { groupRepository.findAll() }
     }
 
     test("createGroup slugifies name and applies default settings") {
+        val (service, groupRepository) = buildService()
+        val capturedResource = slot<GroupResource>()
+        coEvery { groupRepository.insert(capture(capturedResource)) } returns ID("group-123")
+
         val newId = service.createGroup(GroupCreateRequest(name = "Late Night Cruisers"))
 
         newId.id.shouldStartWith("group-")
-        val stored = groupRepository.findById(newId).shouldNotBeNull()
+        coVerify(exactly = 1) { groupRepository.insert(any()) }
+        val stored = capturedResource.captured.shouldNotBeNull()
         stored.name shouldBe "Late Night Cruisers"
         stored.slug shouldBe GlobalSlugify.slugify("Late Night Cruisers")
         stored.settings shouldBe GroupResource.Settings(
@@ -70,14 +71,29 @@ class ServerServiceImplTest : FunSpec({
     }
 
     test("deleteGroup removes existing group") {
-        val group = sampleGroup(idValue = "group-3", name = "Sunrise Drivers")
-        val id = groupRepository.seed("group-3", group)
+        val (service, groupRepository) = buildService()
+        val id = ID<GroupResource>("group-3")
+        coEvery { groupRepository.deleteById(id) } returns true
 
         service.deleteGroup(id).shouldBeTrue()
-        groupRepository.findById(id) shouldBe null
+        coVerify(exactly = 1) { groupRepository.deleteById(id) }
     }
 
     test("deleteGroup returns false when group does not exist") {
-        service.deleteGroup(ID<GroupResource>("group-404")).shouldBeFalse()
+        val (service, groupRepository) = buildService()
+        val id = ID<GroupResource>("group-404")
+        coEvery { groupRepository.deleteById(id) } returns false
+
+        service.deleteGroup(id).shouldBeFalse()
+        coVerify(exactly = 1) { groupRepository.deleteById(id) }
     }
 })
+
+private fun buildService(): Pair<ServerService, Repository<GroupResource>> {
+    val groupRepository = mockk<Repository<GroupResource>>(relaxed = true)
+    val factory = mockk<RepositoryFactory> {
+        every { getGroupRepository() } returns groupRepository
+        every { getUserRepository() } returns mockk()
+    }
+    return ServerServiceImpl(factory) to groupRepository
+}
