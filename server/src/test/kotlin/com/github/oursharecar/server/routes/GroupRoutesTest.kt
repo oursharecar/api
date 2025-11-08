@@ -6,6 +6,7 @@ import com.github.oursharecar.models.ID
 import com.github.oursharecar.models.UserResource
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.repository.RepositoryFactory
+import com.github.oursharecar.server.LinkedMapRepository
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
@@ -17,8 +18,6 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import org.junit.jupiter.api.Test
@@ -36,7 +35,7 @@ class GroupRoutesTest {
 
     @Test
     fun `GET groups returns all available groups`() = testApplication {
-        val repository = FakeGroupRepository()
+        val repository = LinkedMapRepository<GroupResource>()
         val firstGroup = GroupResource(
             id = null,
             name = "Downtown Drivers",
@@ -92,7 +91,7 @@ class GroupRoutesTest {
 
     @Test
     fun `GET groups id returns existing group`() = testApplication {
-        val repository = FakeGroupRepository()
+        val repository = LinkedMapRepository<GroupResource>()
         val group = GroupResource(
             id = null,
             name = "Neighborhood Carpool",
@@ -125,7 +124,7 @@ class GroupRoutesTest {
 
     @Test
     fun `GET groups id returns 404 for missing group`() = testApplication {
-        val repository = FakeGroupRepository()
+        val repository = LinkedMapRepository<GroupResource>()
 
         application {
             configureSerialization()
@@ -139,7 +138,7 @@ class GroupRoutesTest {
 
     @Test
     fun `POST groups persists group and returns new id`() = testApplication {
-        val repository = FakeGroupRepository()
+        val repository = LinkedMapRepository<GroupResource>()
 
         application {
             configureSerialization()
@@ -178,57 +177,12 @@ class GroupRoutesTest {
     )
 }
 
-private class FakeGroupRepository : Repository<GroupResource> {
-    private val storage = linkedMapOf<ID<GroupResource>, GroupResource>()
-    private val slugIndex = mutableMapOf<String, ID<GroupResource>>()
-    private var nextId = 1
-
-    fun seed(idValue: String, group: GroupResource): ID<GroupResource> {
-        val id = ID<GroupResource>(idValue)
-        val resource = group.copy(id = id)
-        storage[id] = resource
-        slugIndex[resource.slug] = id
-        updateCounter(idValue)
-        return id
-    }
-
-    override suspend fun findById(id: ID<GroupResource>): GroupResource? = storage[id]
-
-    override suspend fun existsById(id: ID<GroupResource>): Boolean = storage.containsKey(id)
-
-    override suspend fun insert(entity: GroupResource): ID<GroupResource> {
-        var id: ID<GroupResource>
-        do {
-            val idValue = "group-${nextId++}"
-            id = ID(idValue)
-        } while (storage.containsKey(id))
-
-        val resource = entity.copy(id = id)
-        storage[id] = resource
-        slugIndex[resource.slug] = id
-        return id
-    }
-
-    override suspend fun deleteById(id: ID<GroupResource>): Boolean = storage.remove(id) != null
-
-    override fun findAll(): Flow<GroupResource> = flow {
-        storage.values.forEach { emit(it) }
-    }
-
-    private fun updateCounter(idValue: String) {
-        val numericSuffix = idValue.substringAfterLast('-', "")
-        val candidate = numericSuffix.toIntOrNull()?.plus(1) ?: return
-        if (candidate > nextId) {
-            nextId = candidate
-        }
-    }
-}
-
-private fun Application.configureRouting(repository: FakeGroupRepository) {
+private fun Application.configureRouting(
+    groupRepository: Repository<GroupResource> = LinkedMapRepository(),
+    userRepository: Repository<UserResource> = LinkedMapRepository()
+) {
     configureRouting(ServerServiceImpl(object : RepositoryFactory {
-        override fun getGroupRepository() = repository
-        override fun getUserRepository(): Repository<UserResource> {
-            TODO("Not yet implemented")
-        }
+        override fun getGroupRepository() = groupRepository
+        override fun getUserRepository() = userRepository
     }))
 }
