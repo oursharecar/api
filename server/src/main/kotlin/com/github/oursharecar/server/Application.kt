@@ -16,7 +16,6 @@ fun Application.module() {
     configureSerialization()
     configureAdministration()
     configureObservability()
-    configureSecurity()
     configureStatusPages()
     configureRouting(service)
 }

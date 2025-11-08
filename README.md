@@ -23,8 +23,6 @@ Here's a list of features included in this project:
 | [Micrometer Metrics](https://start.ktor.io/p/metrics-micrometer)            | Enables Micrometer metrics in your Ktor server application.                                             |
 | [Metrics](https://start.ktor.io/p/metrics)                                  | Adds supports for monitoring several metrics                                                            |
 | [Call Logging](https://start.ktor.io/p/call-logging)                        | Logs client requests                                                                                    |
-| [Authentication](https://start.ktor.io/p/auth)                              | Provides extension point for handling the Authorization header                                          |
-| [Authentication JWT](https://start.ktor.io/p/auth-jwt)                      | Handles JSON Web Token (JWT) bearer authentication scheme                                               |
 | [Simple Cache](https://start.ktor.io/p/simple-cache)                        | Provides API for cache management                                                                       |
 | [Simple Memory Cache](https://start.ktor.io/p/simple-memory-cache)          | Provides memory cache for Simple Cache plugin                                                           |
 | [Default Headers](https://start.ktor.io/p/default-headers)                  | Adds a default set of headers to HTTP responses                                                         |
@@ -66,4 +64,3 @@ If the server starts successfully, you'll see the following output:
 2024-12-04 14:32:45.584 [main] INFO  Application - Application started in 0.303 seconds.
 2024-12-04 14:32:45.682 [main] INFO  Application - Responding at http://0.0.0.0:8080
 ```
-

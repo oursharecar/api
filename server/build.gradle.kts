@@ -18,8 +18,6 @@ dependencies {
     implementation(libs.micrometer.registry.prometheus)
     implementation(libs.ktor.server.metrics)
     implementation(libs.ktor.server.call.logging)
-    implementation(libs.ktor.server.auth)
-    implementation(libs.ktor.server.auth.jwt)
     implementation(libs.ktor.simple.cache)
     implementation(libs.ktor.simple.memory.cache)
     implementation(libs.ktor.server.default.headers)
