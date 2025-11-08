@@ -2,19 +2,13 @@ package com.github.oursharecar.server.routes
 
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
-import com.github.oursharecar.models.UserResource
-import com.github.oursharecar.repository.Repository
-import com.github.oursharecar.repository.RepositoryFactory
-import com.github.oursharecar.server.LinkedMapRepository
 import com.github.oursharecar.server.fixtures.sampleGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
-import com.github.oursharecar.server.service.ServerServiceImpl
-import com.github.oursharecar.server.utils.GlobalSlugify
+import com.github.oursharecar.server.service.ServerService
 import io.kotest.assertions.ktor.client.shouldHaveStatus
 import io.kotest.core.spec.style.FunSpec
-import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
@@ -22,7 +16,9 @@ import io.ktor.http.*
 import io.ktor.http.content.*
 import io.ktor.server.application.*
 import io.ktor.server.testing.*
-import kotlinx.coroutines.runBlocking
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.serialization.json.Json
 
 class GroupRoutesTest : FunSpec({
@@ -31,96 +27,67 @@ class GroupRoutesTest : FunSpec({
         encodeDefaults = true
     }
 
-    test("GET /groups returns all available groups") {
+    test("GET /groups returns groups provided by the service") {
         testApplication {
-            val repository = LinkedMapRepository<GroupResource>()
-            val firstGroup = sampleGroup(
-                name = "Downtown Drivers",
-                visibility = GroupResource.Visibility.PUBLIC,
-                joinMode = GroupResource.JoinMode.OPEN,
-                memberLimit = 50,
-                createdBy = "alice",
-                updatedBy = "alice",
-                createdAtMillis = 1_000L,
-                updatedAtMillis = 2_000L
+            val stubbedGroups = listOf(
+                sampleGroup(idValue = "group-1", name = "Downtown Drivers"),
+                sampleGroup(idValue = "group-2", name = "Weekend Riders")
             )
-            val secondGroup = sampleGroup(
-                name = "Weekend Riders",
-                visibility = GroupResource.Visibility.PRIVATE,
-                joinMode = GroupResource.JoinMode.INVITE,
-                memberLimit = 10,
-                createdBy = "bob",
-                updatedBy = "bob",
-                createdAtMillis = 3_000L,
-                updatedAtMillis = 4_000L
-            )
-            repository.seed("group-1", firstGroup)
-            repository.seed("group-2", secondGroup)
-
-            application {
-                configureSerialization()
-                configureRouting(repository)
+            val service = mockk<ServerService> {
+                coEvery { listGroups() } returns stubbedGroups
             }
+
+            application { configureTestRouting(service) }
 
             val response = client.get("/groups")
 
             response shouldHaveStatus HttpStatusCode.OK
             val decoded = json.decodeFromString<List<GroupResource>>(response.bodyAsText())
-            decoded shouldBe listOf(
-                firstGroup.copy(id = ID("group-1")),
-                secondGroup.copy(id = ID("group-2"))
-            )
+            decoded shouldBe stubbedGroups
+            coVerify(exactly = 1) { service.listGroups() }
         }
     }
 
-    test("GET /groups/{id} returns existing group") {
+    test("GET /groups/{id} returns existing group from the service") {
         testApplication {
-            val repository = LinkedMapRepository<GroupResource>()
-            val group = sampleGroup(
-                name = "Neighborhood Carpool",
-                createdBy = "carol",
-                updatedBy = "carol",
-                createdAtMillis = 5_000L,
-                updatedAtMillis = 6_000L
-            )
-            val id = repository.seed("group-42", group)
-
-            application {
-                configureSerialization()
-                configureRouting(repository)
+            val expected = sampleGroup(idValue = "group-42", name = "Neighborhood Carpool")
+            val service = mockk<ServerService> {
+                coEvery { getGroup(ID("group-42")) } returns expected
             }
 
-            val response = client.get("/groups/${id.id}")
+            application { configureTestRouting(service) }
+
+            val response = client.get("/groups/group-42")
 
             response shouldHaveStatus HttpStatusCode.OK
             val decoded = json.decodeFromString<GroupResource>(response.bodyAsText())
-            decoded shouldBe group.copy(id = ID("group-42"))
+            decoded shouldBe expected
+            coVerify(exactly = 1) { service.getGroup(ID("group-42")) }
         }
     }
 
-    test("GET /groups/{id} returns 404 when missing") {
+    test("GET /groups/{id} returns 404 when the service cannot find the group") {
         testApplication {
-            val repository = LinkedMapRepository<GroupResource>()
-
-            application {
-                configureSerialization()
-                configureRouting(repository)
+            val service = mockk<ServerService> {
+                coEvery { getGroup(ID("group-missing")) } returns null
             }
+
+            application { configureTestRouting(service) }
 
             val response = client.get("/groups/group-missing")
 
             response shouldHaveStatus HttpStatusCode.NotFound
+            coVerify(exactly = 1) { service.getGroup(ID("group-missing")) }
         }
     }
 
-    test("POST /groups persists group and returns new id") {
+    test("POST /groups forwards payload to the service and returns new id") {
         testApplication {
-            val repository = LinkedMapRepository<GroupResource>()
-
-            application {
-                configureSerialization()
-                configureRouting(repository)
+            val service = mockk<ServerService> {
+                coEvery { createGroup(any()) } returns ID("group-777")
             }
+
+            application { configureTestRouting(service) }
 
             val request = GroupCreateRequest(name = "Late Night Cruisers")
             val response = client.post("/groups") {
@@ -133,21 +100,29 @@ class GroupRoutesTest : FunSpec({
             }
 
             response shouldHaveStatus HttpStatusCode.OK
-            val createdId = Json.decodeFromString<ID<GroupResource>>(response.bodyAsText())
+            val createdId = json.decodeFromString<ID<GroupResource>>(response.bodyAsText())
+            createdId shouldBe ID("group-777")
+            coVerify(exactly = 1) { service.createGroup(request) }
+        }
+    }
 
-            val stored = runBlocking { repository.findById(createdId) }.shouldNotBeNull()
-            stored.name shouldBe "Late Night Cruisers"
-            stored.slug shouldBe GlobalSlugify.slugify("Late Night Cruisers")
+    test("DELETE /groups/{id} responds with 204 and signals the service") {
+        testApplication {
+            val service = mockk<ServerService> {
+                coEvery { deleteGroup(ID("group-9")) } returns true
+            }
+
+            application { configureTestRouting(service) }
+
+            val response = client.delete("/groups/group-9")
+
+            response shouldHaveStatus HttpStatusCode.NoContent
+            coVerify(exactly = 1) { service.deleteGroup(ID("group-9")) }
         }
     }
 })
 
-private fun Application.configureRouting(
-    groupRepository: Repository<GroupResource> = LinkedMapRepository(),
-    userRepository: Repository<UserResource> = LinkedMapRepository()
-) {
-    configureRouting(ServerServiceImpl(object : RepositoryFactory {
-        override fun getGroupRepository() = groupRepository
-        override fun getUserRepository() = userRepository
-    }))
+private fun Application.configureTestRouting(service: ServerService) {
+    configureSerialization()
+    configureRouting(service)
 }
