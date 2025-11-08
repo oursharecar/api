@@ -14,6 +14,8 @@ import com.github.oursharecar.server.service.ServerServiceImpl
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.kotest.assertions.ktor.client.shouldHaveStatus
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.matchers.nulls.shouldNotBeNull
+import io.kotest.matchers.shouldBe
 import io.ktor.client.request.*
 import io.ktor.client.statement.*
 import io.ktor.http.*
@@ -22,8 +24,6 @@ import io.ktor.server.application.*
 import io.ktor.server.testing.*
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
-import kotlin.test.assertEquals
-import kotlin.test.assertNotNull
 import kotlin.time.ExperimentalTime
 import kotlin.time.Instant
 
@@ -81,12 +81,9 @@ class GroupRoutesTest : FunSpec({
 
             response shouldHaveStatus HttpStatusCode.OK
             val decoded = json.decodeFromString<List<GroupResource>>(response.bodyAsText())
-            assertEquals(
-                listOf(
-                    firstGroup.copy(id = ID("group-1")),
-                    secondGroup.copy(id = ID("group-2"))
-                ),
-                decoded
+            decoded shouldBe listOf(
+                firstGroup.copy(id = ID("group-1")),
+                secondGroup.copy(id = ID("group-2"))
             )
         }
     }
@@ -121,7 +118,7 @@ class GroupRoutesTest : FunSpec({
 
             response shouldHaveStatus HttpStatusCode.OK
             val decoded = json.decodeFromString<GroupResource>(response.bodyAsText())
-            assertEquals(group.copy(id = ID("group-42")), decoded)
+            decoded shouldBe group.copy(id = ID("group-42"))
         }
     }
 
@@ -162,10 +159,9 @@ class GroupRoutesTest : FunSpec({
             response shouldHaveStatus HttpStatusCode.OK
             val createdId = Json.decodeFromString<ID<GroupResource>>(response.bodyAsText())
 
-            val stored = runBlocking { repository.findById(createdId) }
-            assertNotNull(stored)
-            assertEquals("Late Night Cruisers", stored.name)
-            assertEquals(GlobalSlugify.slugify("Late Night Cruisers"), stored.slug)
+            val stored = runBlocking { repository.findById(createdId) }.shouldNotBeNull()
+            stored.name shouldBe "Late Night Cruisers"
+            stored.slug shouldBe GlobalSlugify.slugify("Late Night Cruisers")
         }
     }
 })
