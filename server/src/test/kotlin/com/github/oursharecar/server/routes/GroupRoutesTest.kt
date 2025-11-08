@@ -226,5 +226,8 @@ private class FakeGroupRepository : Repository<GroupResource> {
 private fun Application.configureRouting(repository: FakeGroupRepository) {
     configureRouting(ServerServiceImpl(object : RepositoryFactory {
         override fun getGroupRepository() = repository
+        override fun getUserRepository(): Repository<UserResource> {
+            TODO("Not yet implemented")
+        }
     }))
 }
