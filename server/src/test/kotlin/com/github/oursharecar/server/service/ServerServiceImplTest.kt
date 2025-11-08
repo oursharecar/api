@@ -1,11 +1,11 @@
 package com.github.oursharecar.server.service
 
-import com.github.oursharecar.models.AuditableResource
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.models.UserResource
 import com.github.oursharecar.repository.RepositoryFactory
 import com.github.oursharecar.server.LinkedMapRepository
+import com.github.oursharecar.server.fixtures.sampleGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
 import com.github.oursharecar.server.utils.GlobalSlugify
 import io.kotest.core.spec.style.FunSpec
@@ -16,7 +16,6 @@ import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldStartWith
 import kotlin.time.ExperimentalTime
-import kotlin.time.Instant
 
 @OptIn(ExperimentalTime::class)
 class ServerServiceImplTest : FunSpec({
@@ -82,33 +81,3 @@ class ServerServiceImplTest : FunSpec({
         service.deleteGroup(ID<GroupResource>("group-404")).shouldBeFalse()
     }
 })
-
-@OptIn(ExperimentalTime::class)
-private fun sampleGroup(
-    idValue: String? = null,
-    name: String = "Downtown Drivers",
-    slug: String = GlobalSlugify.slugify(name),
-    visibility: GroupResource.Visibility = GroupResource.Visibility.PUBLIC,
-    joinMode: GroupResource.JoinMode = GroupResource.JoinMode.REQUEST,
-    memberLimit: Int = 25,
-    createdBy: String = "tester",
-    updatedBy: String = createdBy,
-    createdAtMillis: Long = 1_000L,
-    updatedAtMillis: Long = 2_000L
-): GroupResource =
-    GroupResource(
-        id = idValue?.let { ID(it) },
-        name = name,
-        slug = slug,
-        settings = GroupResource.Settings(
-            visibility = visibility,
-            joinMode = joinMode,
-            memberLimit = memberLimit
-        ),
-        audit = AuditableResource(
-            createdAt = Instant.fromEpochMilliseconds(createdAtMillis),
-            updatedAt = Instant.fromEpochMilliseconds(updatedAtMillis),
-            createdBy = createdBy,
-            updatedBy = updatedBy
-        )
-    )
