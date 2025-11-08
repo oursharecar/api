@@ -3,6 +3,7 @@ package com.github.oursharecar.server.routes
 import com.github.oursharecar.models.AuditableResource
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
+import com.github.oursharecar.models.UserResource
 import com.github.oursharecar.repository.Repository
 import com.github.oursharecar.repository.RepositoryFactory
 import com.github.oursharecar.server.models.GroupCreateRequest
@@ -156,9 +157,9 @@ class GroupRoutesTest {
         }
 
         assertEquals(HttpStatusCode.OK, response.status)
-        val createdId = response.bodyAsText()
+        val createdId = Json.decodeFromString<ID<GroupResource>>(response.bodyAsText())
 
-        val stored = runBlocking { repository.findById(ID<GroupResource>(createdId)) }
+        val stored = runBlocking { repository.findById(createdId) }
         assertNotNull(stored)
         assertEquals("Late Night Cruisers", stored.name)
         assertEquals(GlobalSlugify.slugify("Late Night Cruisers"), stored.slug)
