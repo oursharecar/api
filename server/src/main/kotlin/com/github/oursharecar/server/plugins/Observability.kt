@@ -32,6 +32,7 @@ fun Application.configureObservability() {
         level = Level.INFO
         filter { call -> call.request.path().startsWith("/") }
     }
+
     routing {
         get("/internal/metrics") {
             call.respond(appMicrometerRegistry.scrape())
