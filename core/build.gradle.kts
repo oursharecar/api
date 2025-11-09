@@ -25,6 +25,7 @@ kotlin {
             implementation(libs.kotest.runner.junit5)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.mongo.java.server)
+            implementation(libs.mockk.mockk)
         }
         all {
             languageSettings.enableLanguageFeature("PropertyParamAnnotationDefaultTargetMode")
