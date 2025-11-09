@@ -17,5 +17,6 @@ fun Application.module() {
     configureAdministration()
     configureObservability()
     configureStatusPages()
+    configureRateLimiting()
     configureRouting(service)
 }
