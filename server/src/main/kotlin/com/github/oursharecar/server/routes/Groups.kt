@@ -3,6 +3,7 @@ package com.github.oursharecar.server.routes
 import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.server.service.ServerService
+import io.github.westelh.ktor.simpleCache.cacheOutput
 import io.ktor.http.*
 import io.ktor.resources.*
 import io.ktor.server.request.*
@@ -14,6 +15,10 @@ import io.ktor.server.routing.*
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
 import kotlinx.serialization.Serializable
+import kotlin.time.Duration.Companion.seconds
+
+private val groupsCollectionCacheTtl = 5.seconds
+private val groupDetailCacheTtl = 30.seconds
 
 @Serializable
 @Resource("/groups")
@@ -30,20 +35,24 @@ class Groups {
 
 fun Route.groupRoutes(service: ServerService) {
     // Operations on a collection of groups
-    get<Groups> {
-        call.respond<List<GroupResource>>(service.listGroups())
+    cacheOutput(invalidateAt = groupsCollectionCacheTtl) {
+        get<Groups> {
+            call.respond<List<GroupResource>>(service.listGroups())
+        }
     }
     post<Groups> {
         call.respond<ID<GroupResource>>(service.createGroup(call.receive()))
     }
 
     // Operations on a single group identified by ID
-    get<Groups.Id> { group ->
-        val result = service.getGroup(group.id)
-        if (result != null) {
-            call.respond<GroupResource>(result)
-        } else {
-            call.respond<String>(HttpStatusCode.NotFound, "Group not found")
+    cacheOutput(invalidateAt = groupDetailCacheTtl) {
+        get<Groups.Id> { group ->
+            val result = service.getGroup(group.id)
+            if (result != null) {
+                call.respond<GroupResource>(result)
+            } else {
+                call.respond<String>(HttpStatusCode.NotFound, "Group not found")
+            }
         }
     }
     patch<Groups.Id> { group ->
@@ -79,4 +88,3 @@ fun Route.groupRoutes(service: ServerService) {
         call.respond(HttpStatusCode.NotImplemented)
     }
 }
-

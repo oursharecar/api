@@ -4,6 +4,7 @@ import com.github.oursharecar.models.GroupResource
 import com.github.oursharecar.models.ID
 import com.github.oursharecar.server.fixtures.sampleGroup
 import com.github.oursharecar.server.models.GroupCreateRequest
+import com.github.oursharecar.server.plugins.configureCaching
 import com.github.oursharecar.server.plugins.configureRouting
 import com.github.oursharecar.server.plugins.configureSerialization
 import com.github.oursharecar.server.service.ServerService
@@ -124,5 +125,6 @@ class GroupRoutesTest : FunSpec({
 
 private fun Application.configureTestRouting(service: ServerService) {
     configureSerialization()
+    configureCaching()
     configureRouting(service)
 }

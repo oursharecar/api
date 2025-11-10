@@ -42,6 +42,8 @@ kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.
 kotest-assertions-ktor = { module = "io.kotest:kotest-assertions-ktor", version.ref = "kotest" }
 mockk-mockk = { module = "io.mockk:mockk", version = "1.14.6" }
 slugify = { module = "com.github.slugify:slugify", version = "3.0.6" }
+ktor-simple-cache = { module = "io.github.westelh:ktor-simple-cache", version = "0.55.4" }
+ktor-simple-memory-cache = { module = "io.github.westelh:ktor-simple-memory-cache", version = "0.55.4" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }

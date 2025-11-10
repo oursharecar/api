@@ -21,6 +21,8 @@ dependencies {
     implementation(libs.ktor.server.default.headers)
     implementation(libs.ktor.server.conditional.headers)
     implementation(libs.ktor.server.status.pages)
+    implementation(libs.ktor.simple.cache)
+    implementation(libs.ktor.simple.memory.cache)
     implementation(libs.ktor.server.resources)
     implementation(libs.ktor.server.cio)
     implementation(libs.logback.classic)

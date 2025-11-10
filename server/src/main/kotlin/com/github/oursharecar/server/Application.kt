@@ -18,5 +18,6 @@ fun Application.module() {
     configureObservability()
     configureStatusPages()
     configureRateLimiting()
+    configureCaching()
     configureRouting(service)
 }
