@@ -7,6 +7,7 @@ coroutines = "1.10.2"
 serialization = "1.9.0"
 kotest = "6.0.4"
 mongodb = "5.6.1"
+flapdoodle = "3.5.4"
 
 [libraries]
 ktor-server-rate-limiting = { module = "io.ktor:ktor-server-rate-limit", version.ref = "ktor" }
@@ -36,7 +37,6 @@ kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version 
 mongodb-driver-kotlin-coroutine = { module = "org.mongodb:mongodb-driver-kotlin-coroutine", version.ref = "mongodb" }
 mongodb-bson-kotlinx = { module = "org.mongodb:bson-kotlinx", version.ref = "mongodb" }
 kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "coroutines" }
-mongo-java-server = { module = "de.bwaldvogel:mongo-java-server", version = "1.46.0" }
 kotest-runner-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "kotest" }
 kotest-assertions-core = { module = "io.kotest:kotest-assertions-core", version.ref = "kotest" }
 kotest-assertions-ktor = { module = "io.kotest:kotest-assertions-ktor", version.ref = "kotest" }
@@ -44,6 +44,7 @@ mockk-mockk = { module = "io.mockk:mockk", version = "1.14.6" }
 slugify = { module = "com.github.slugify:slugify", version = "3.0.6" }
 ktor-simple-cache = { module = "io.github.westelh:ktor-simple-cache", version = "0.55.4" }
 ktor-simple-memory-cache = { module = "io.github.westelh:ktor-simple-memory-cache", version = "0.55.4" }
+flapdoodle-embed-mongo = { module = "de.flapdoodle.embed:de.flapdoodle.embed.mongo", version.ref = "flapdoodle" }
 
 [plugins]
 kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
