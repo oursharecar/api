@@ -10,6 +10,7 @@ interface Repository<T : Any> {
     suspend fun insert(entity: T): ID<T>
     suspend fun deleteById(id: ID<T>): Boolean
     fun findAll(): Flow<T>
+    fun findAll(limit: Int): Flow<T>
 }
 
 interface WrappedRepository<R : Any, T : Any> : Repository<R> {
@@ -31,4 +32,5 @@ interface WrappedRepository<R : Any, T : Any> : Repository<R> {
 
     override suspend fun deleteById(id: ID<R>): Boolean = impl.deleteById(id.toDocumentId())
     override fun findAll(): Flow<R> = impl.findAll().map { it.toResource() }
+    override fun findAll(limit: Int): Flow<R> = impl.findAll(limit).map { it.toResource() }
 }

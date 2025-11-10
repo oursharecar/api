@@ -36,4 +36,5 @@ class MongoRepository<T : Any>(
     }
 
     override fun findAll(): Flow<T> = collection.find()
+    override fun findAll(limit: Int) = collection.find().limit(limit)
 }
