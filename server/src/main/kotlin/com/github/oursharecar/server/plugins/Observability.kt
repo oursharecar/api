@@ -7,8 +7,8 @@ import io.ktor.server.plugins.calllogging.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.routing.*
-import io.micrometer.prometheus.PrometheusConfig
-import io.micrometer.prometheus.PrometheusMeterRegistry
+import io.micrometer.prometheusmetrics.PrometheusConfig
+import io.micrometer.prometheusmetrics.PrometheusMeterRegistry
 import io.opentelemetry.instrumentation.ktor.v3_0.KtorServerTelemetry
 import org.slf4j.event.Level
 
