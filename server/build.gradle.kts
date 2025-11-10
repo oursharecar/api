@@ -39,8 +39,6 @@ dependencies {
     implementation(libs.logback.classic)
 
     // Data access and utilities
-    implementation(libs.mongodb.driver.kotlin.coroutine)
-    implementation(libs.mongodb.bson.kotlinx)
     implementation(libs.slugify)
 
     testImplementation(libs.ktor.server.test.host)

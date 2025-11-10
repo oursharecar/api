@@ -9,7 +9,7 @@ import com.github.oursharecar.repository.mongodb.documents.UserDocument
 import com.mongodb.kotlin.client.coroutine.MongoClient
 
 class MongoRepositoryFactory(config: MongoRepositoryConfig) : RepositoryFactory {
-    private val client = MongoClient.Factory.create(config.clientSettings)
+    private val client = MongoClient.Factory.create(config.buildSettings())
     private val database = client.getDatabase(config.databaseName)
     private val groupCollection = database.getCollection<GroupDocument>(config.groupCollectionName)
     private val userCollection = database.getCollection<UserDocument>(config.userCollectionName)
