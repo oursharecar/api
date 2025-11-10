@@ -9,4 +9,3 @@ dependencyResolutionManagement {
 
 include(":server")
 include(":core")
-include(":client")
