@@ -26,7 +26,8 @@ kotlin {
             implementation(libs.kotest.runner.junit5)
             implementation(libs.kotlinx.coroutines.test)
             implementation(libs.mockk.mockk)
-            implementation(libs.flapdoodle.embed.mongo)
+            implementation(libs.testcontainers.core)
+            implementation(libs.testcontainers.mongodb)
         }
         all {
             languageSettings.enableLanguageFeature("PropertyParamAnnotationDefaultTargetMode")
