@@ -11,6 +11,7 @@ interface Repository<T : Any> {
     suspend fun deleteById(id: ID<T>): Boolean
     fun findAll(): Flow<T>
     fun findAll(limit: Int): Flow<T>
+    suspend fun findAll(pageRequest: PageRequest): Page<T>
 }
 
 interface WrappedRepository<R : Any, T : Any> : Repository<R> {
@@ -33,4 +34,14 @@ interface WrappedRepository<R : Any, T : Any> : Repository<R> {
     override suspend fun deleteById(id: ID<R>): Boolean = impl.deleteById(id.toDocumentId())
     override fun findAll(): Flow<R> = impl.findAll().map { it.toResource() }
     override fun findAll(limit: Int): Flow<R> = impl.findAll(limit).map { it.toResource() }
+    override suspend fun findAll(pageRequest: PageRequest): Page<R> {
+        val page = impl.findAll(pageRequest)
+        return Page(
+            content = page.content.map { it.toResource() },
+            page = page.page,
+            size = page.size,
+            totalElements = page.totalElements,
+            sort = page.sort
+        )
+    }
 }
