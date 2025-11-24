@@ -1,7 +1,7 @@
 [versions]
 coroutines = "1.10.2"
 kotlin = "2.2.21"
-kotest = "6.0.4"
+kotest = "6.0.5"
 ktor = "3.3.1"
 logback = "1.5.20"
 mongodb = "5.6.1"
