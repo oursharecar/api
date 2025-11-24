@@ -14,7 +14,7 @@ testcontainers = "2.0.1"
 logback-classic = { module = "ch.qos.logback:logback-classic", version.ref = "logback" }
 
 # com.github.*
-slugify = { module = "com.github.slugify:slugify", version = "3.0.6" }
+slugify = { module = "com.github.slugify:slugify", version = "3.0.7" }
 
 # io.github.*
 ktor-simple-cache = { module = "io.github.westelh:ktor-simple-cache", version = "0.55.4" }
